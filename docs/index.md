@@ -3,7 +3,7 @@ layout: default
 title:  Home
 ---
 
-Source code: https://github.com/USER/PROJECT (_fix this_)
+Source code: https://github.com/haodonq/CS175_AI (_fix this_)
 
 Reports:
 
