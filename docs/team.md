@@ -6,11 +6,11 @@ title:  Team
 # {{ page.title }}
 
 
-## USER 1
+## Haodong Qi
 ***UCI Net ID***: haodonq
 
-## USER 2
-***UCI Net ID***: ucinetid2
+## Chenghui Zhang
+***UCI Net ID***: chenghz2
 
-## USER 3
-***UCI Net ID***: ucinetid3
+## Yao Luo
+***UCI Net ID***: luoy20
