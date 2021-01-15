@@ -4,10 +4,9 @@
 
 In this project, our team is planning to develop a intelligent agent under Temple Run like setting. The goal of this AI is to collect as many points (diamonds/gold) as possible, while trying to escape from the ghost. There are different kind of challenges like wide gap, obstacles on the top and dip along the way. Thus, we plan to implement a random map generator combining different obstacles, which also supports seed functionality.
 
-| <div style="text-align: center">Reference Picture</div>      |
+| <div align="center">Reference Picture</div>                  |
 | ------------------------------------------------------------ |
-| <div style="text-align: center"><img src="https://cdn.slashgear.com/wp-content/uploads/2012/02/TempleRun-screens.jpeg" alt="Temple Run for Android to be announced via Facebook - SlashGear" style="zoom: 50%;" /></div> |
-|                                                              |
+| <div align="center"><img src="https://cdn.slashgear.com/wp-content/uploads/2012/02/TempleRun-screens.jpeg" alt="Temple Run for Android to be announced via Facebook - SlashGear" style="zoom: 50%;" /></div> |
 
 #### 1.2 Possible Input&Output
 
