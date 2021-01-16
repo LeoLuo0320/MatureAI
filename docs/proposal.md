@@ -4,15 +4,15 @@
 
 In this project, our team is planning to develop an intelligent agent under Temple Run like setting. The goal of this AI is to collect as many points (diamonds/gold) as possible, while trying to escape from the ghost. There are different kind of challenges like wide gap, obstacles on the top and dip along the way. Thus, we plan to implement a random map generator combining different obstacles, which also supports seed functionality.
 
-| <div align="center">Reference Picture</div>                  |
+| Reference Picture                  |
 | ------------------------------------------------------------ |
-| <div align="center"><img src="https://cdn.slashgear.com/wp-content/uploads/2012/02/TempleRun-screens.jpeg" alt="Temple Run for Android to be announced via Facebook - SlashGear" style="zoom: 50%;" /></div> |
+| <img src="https://cdn.slashgear.com/wp-content/uploads/2012/02/TempleRun-screens.jpeg" alt="Temple Run for Android to be announced via Facebook - SlashGear" style="zoom: 50%;" /> |
 
 #### 1.2 Possible Input&Output
 
-The output of our AI will combination of move right/left, jump, and use items/potions.
+The output of our AI will be combination of moving right/left, jumping, and using items/potions.
 
-The input of our agent could be raw pixels on the screen, or the blocks that is close to the agent.
+The input of our agent could be raw pixels on the screen, or the blocks that are close to the agent.
 
 ## 2. Candidate Algorithms
 
@@ -46,5 +46,5 @@ For unexpected behavior and wired output, we will track actions of our agent and
 
 Our agent will never die and it will run forever! At the same time, it can discern traps. For example, he will not collect gold above a gap, because it will die for that. Also, it will jump to collect gold or diamond if there is any. 
 
-## 4. Appointment with the Instructor
+#### 4. Appointment with the Instructor
 
