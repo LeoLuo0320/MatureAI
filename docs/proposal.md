@@ -24,25 +24,25 @@ The input of our agent could be raw pixels on the screen, or the blocks that is 
 
 #### 3.1 Quantitative Evaluation
 
-1. Numeric
+<strong>Numeric</strong>
 
 For each random map generated, we calculted the regret metric. We will evaluate the difference bewteen the reward, gold and diamond in this scenario, of optimal decision and that collected by the agent. The smaller the difference, the better the performance of our agent. 
 
-2. Baselines
+<strong>Baselines</strong>
 
 The goal of our agent is to jump across wide gaps and escape from the ghost, or it will die and the game will end. At the same time, it should also collect as much gold and diamond as possible. 
 
 #### 3.2 Qualitative Evaluation
 
-1. Simple Example Cases
+<strong>Simple Example Cases</strong>
 
 Our agent are expected to survive as long as possible, which means that it must jump across obstacles and turn left or right to avoid hitting the wall. At the same time, it will collect gold and diamond as much as possible, without taking greate risk of dying. 
 
-2. Error Analysis and Introspection
+<strong>Error Analysis and Introspection</strong>
 
 For unexpected behavior and wired output, we will track actions of our agent and look at the generated map again to conclude what is the issue. If it does not work, we can output the map and action list, then hand simulate the process to find potential improvement. 
 
-3. The Super-Impressive Example
+<strong>The Super-Impressive Example</strong>
 
 Our agent will never die and it will run forever! At the same time, it can discern traps. For example, he will not collect gold above a gap, because it will die for that. Also, it will jump to collect gold or diamond if there is any. 
 
