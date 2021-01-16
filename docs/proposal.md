@@ -2,11 +2,11 @@
 
 #### 1.1 Setup and Goals
 
-In this project, our team is planning to develop a intelligent agent under Temple Run like setting. The goal of this AI is to collect as many points (diamonds/gold) as possible, while trying to escape from the ghost. There are different kind of challenges like wide gap, obstacles on the top and dip along the way. Thus, we plan to implement a random map generator combining different obstacles, which also supports seed functionality.
+In this project, our team is planning to develop an intelligent agent under Temple Run like setting. The goal of this AI is to collect as many points (diamonds/gold) as possible, while trying to escape from the ghost. There are different kind of challenges like wide gap, obstacles on the top and dip along the way. Thus, we plan to implement a random map generator combining different obstacles, which also supports seed functionality.
 
-| <div align="center">Reference Picture</div>                  |
+| <div text-align="center">Reference Picture</div>                  |
 | ------------------------------------------------------------ |
-| <div align="center"><img src="https://cdn.slashgear.com/wp-content/uploads/2012/02/TempleRun-screens.jpeg" alt="Temple Run for Android to be announced via Facebook - SlashGear" style="zoom: 50%;" /></div> |
+| <div text-align="center"><img src="https://cdn.slashgear.com/wp-content/uploads/2012/02/TempleRun-screens.jpeg" alt="Temple Run for Android to be announced via Facebook - SlashGear" style="zoom: 50%;" /></div> |
 
 #### 1.2 Possible Input&Output
 
@@ -24,4 +24,27 @@ The input of our agent could be raw pixels on the screen, or the blocks that is 
 
 #### 3.1 Quantitative Evaluation
 
+###### 3.1.1 Numeric
+
+For each random map generated, we calculted the regret metric. We will evaluate the difference bewteen the reward, gold and diamond in this scenario, of optimal decision and that collected by the agent. The smaller the difference, the better the performance of our agent. 
+
+###### 3.1.2 Baselines
+
+The goal of our agent is to jump across wide gaps and escape from the ghost, or it will die and the game will end. At the same time, it should also collect as much gold and diamond as possible. 
+
 #### 3.2 Qualitative Evaluation
+
+###### 3.2.1 Simple Example Cases
+
+Our agent are expected to survive as long as possible, which means that it must jump across obstacles and turn left or right to avoid hitting the wall. At the same time, it will collect gold and diamond as much as possible, without taking greate risk of dying. 
+
+###### 3.2.2 Error Analysis and Introspection
+
+For unexpected behavior and wired output, we will track actions of our agent and look at the generated map again to conclude what is the issue. If it does not work, we can output the map and action list, then hand simulate the process to find potential improvement. 
+
+###### 3.2.3 The Super-Impressive Example
+
+Our agent will never die and it will run forever! At the same time, it can discern traps. For example, he will not collect gold above a gap, because it will die for that. Also, it will jump to collect gold or diamond if there is any. 
+
+## 4. Appointment with the Instructor
+
