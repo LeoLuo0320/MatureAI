@@ -48,3 +48,4 @@ Our agent will never die and it will run forever! At the same time, it can disce
 
 #### 4. Appointment with the Instructor
 
+4:45pm - 5:00pm, Wednesday, January 27, 2021. 
