@@ -3,7 +3,7 @@ layout: default
 title:  Home
 ---
 
-Source code: https://github.com/haodonq/CS175_AI
+Source code: https://github.com/haodonq/MatureAI
 
 Reports:
 
