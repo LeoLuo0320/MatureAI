@@ -85,14 +85,38 @@ def _get_tnt_and_triggers(length = 110,prepartion_time = 50,interval_time = 15,s
         TNT_and_TRIGGERS += f"<DrawBlock x='2' y='49' z='{i+4}' type='diamond_block'/> \n"
     return TNT_and_TRIGGERS
 
+def _get_obstacles(obs_density, length):
 
+    assert 0 < obs_density <= 0.3
+    obs_types = {1:"jungle_fence_gate", 2:["stone_slab","fence","stone_slab"]}
 
+    result = ""
+    obs_num = int(length * obs_density)
+    choices = np.arange(1, length, dtype=np.int32).reshape(-1,5)
+    choices = np.random.permutation(choices)[:obs_num]
+
+    for i in range(choices.shape[0]):
+        roll = np.random.choice(list(obs_types.keys()))
+        obs = obs_types[roll]
+        if type(obs) != list:
+            result += f"<DrawBlock x='-1' y='50' z='{choices[i][1]}' type='{obs_types[roll]}'/> \n"
+            result += f"<DrawBlock x='0' y='50' z='{choices[i][1]}' type='{obs_types[roll]}'/> \n"
+            result += f"<DrawBlock x='1' y='50' z='{choices[i][1]}' type='{obs_types[roll]}'/> \n"
+            result += f"<DrawBlock x='2' y='50' z='{choices[i][1]}' type='{obs_types[roll]}'/> \n"
+        else:
+            for j in range(-1,3):
+                result += f"<DrawBlock x='{j}' y='50' z='{choices[i][0]}' type='{obs_types[roll][0]}'/> \n"
+                result += f"<DrawBlock x='{j}' y='50' z='{choices[i][1]}' type='{obs_types[roll][1]}'/> \n"
+                result += f"<DrawBlock x='{j}' y='50' z='{choices[i][2]}' type='{obs_types[roll][2]}'/> \n"
+
+    return result
 
 def GetXML():
     """Returns the XML for the project"""
-    map_length = 60
-
+    map_length = 81
+    obs_density = 0.3
     TNT_and_TRIGGERS = _get_tnt_and_triggers(length=map_length)
+    obs = _get_obstacles(obs_density, map_length)
 
     missionXML = f'''<?xml version="1.0" encoding="UTF-8" standalone="no" ?>
                     <Mission xmlns="http://ProjectMalmo.microsoft.com" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
@@ -116,7 +140,7 @@ def GetXML():
                                     <DrawCuboid x1='-1' x2='2' y1='49' y2='49' z1='0' z2='{map_length}' type='grass'/>
                                     <DrawCuboid x1='-1' x2='2' y1='48' y2='48' z1='0' z2='{map_length}' type='air'/>
                                     <DrawCuboid x1='-1' x2='2' y1='47' y2='47' z1='0' z2='{map_length}' type='stone'/>''' + \
-                 TNT_and_TRIGGERS + \
+                 TNT_and_TRIGGERS + obs +\
                  '''</DrawingDecorator>
                  <ServerQuitWhenAnyAgentFinishes/>
                  <ServerQuitFromTimeUp timeLimitMs="1000000"/>
