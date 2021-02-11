@@ -35,3 +35,9 @@ At the same time, our ambition is to use raw pixel instead of world state observ
 When we try to use computer vision and raw pixels, we realize that it is more complex than we initially thought. 
 The first challenge is using computer vision to detect surrounding objects. We will implement a color segmentation method to quickly detect the boundary of each object, and separate them using different colors. We need to be really careful when setting threshold values, because colors of some single blocks are composed of multiple colors, and we need to treat them as a whole and replace them with the same color.
 The second challenge is to use computer vision to detect obstacles. When trying to implement computer vision with opencv, we have to find the distance obstacles and our agent, then reflect this distance in our map. This step requires careful calculation so our agent will know exactly where the obstacles lie. 
+
+# Resources Used
+- [OpenCV](https://opencv.org/)
+- Malmo Tutorial
+- Assignment 2
+- Stack Overflow
