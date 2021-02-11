@@ -74,7 +74,15 @@ def _get_tnt_and_triggers(length = 110,prepartion_time = 50,interval_time = 15,s
             TNT_and_TRIGGERS += f"<DrawBlock x='{2}' y='48' z='{i}'  type ='redstone_wire'/> \n"
             TNT_and_TRIGGERS += f"<DrawBlock x='{3}' y='48' z='{i}'  type ='redstone_wire'/> \n"
         odd = (odd != True)
-
+    else: # adding destination block
+        TNT_and_TRIGGERS += f"<DrawBlock x='-1' y='49' z='{i+3}' type='diamond_block'/> \n"
+        TNT_and_TRIGGERS += f"<DrawBlock x='-0' y='49' z='{i+3}' type='diamond_block'/> \n"
+        TNT_and_TRIGGERS += f"<DrawBlock x='1' y='49' z='{i+3}' type='diamond_block'/> \n"
+        TNT_and_TRIGGERS += f"<DrawBlock x='2' y='49' z='{i+3}' type='diamond_block'/> \n"
+        TNT_and_TRIGGERS += f"<DrawBlock x='-1' y='49' z='{i+4}' type='diamond_block'/> \n"
+        TNT_and_TRIGGERS += f"<DrawBlock x='-0' y='49' z='{i+4}' type='diamond_block'/> \n"
+        TNT_and_TRIGGERS += f"<DrawBlock x='1' y='49' z='{i+4}' type='diamond_block'/> \n"
+        TNT_and_TRIGGERS += f"<DrawBlock x='2' y='49' z='{i+4}' type='diamond_block'/> \n"
     return TNT_and_TRIGGERS
 
 
