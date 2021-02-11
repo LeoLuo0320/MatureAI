@@ -15,21 +15,33 @@ else:
 video_width = 800
 video_height = 600
 
-def _get_tnt_and_triggers(prepartion_time = 25,interval_time = 35,step = 7):
+def _get_tnt_and_triggers(length = 110,prepartion_time = 50,interval_time = 15,step = 7):
+    """
+        Generating XML for TNT and redstone triggers
+        :Parameterms
+            prepartion_time: 10 prepartion time translate into 1 second,
+            after 1 second, the first TNT will be ignited, and after 4 second
+            the first TNT will explode
 
+            interval_time : The interval time for two rows TNT to be ignited
+
+             step: number of block between two rows of TNT
+
+             length : indicating the length of the map
+    """
     TNT_and_TRIGGERS = ""
     odd = True
     num_of_repeater = interval_time  # each repeater will have 0.1 delay
     _counter = 0
 
-    for i in range((-48-prepartion_time),-48):
+    for i in range(-prepartion_time,0):
         TNT_and_TRIGGERS += f"<DrawBlock x='{3}' y='47' z='{i}' type ='stone'/> \n"
         TNT_and_TRIGGERS += f"<DrawBlock x='{3}' y='48' z='{i}' face='NORTH' type ='unpowered_repeater'/> \n"
     else:
-        TNT_and_TRIGGERS += f"<DrawBlock x='{3}' y='48' z='{(-48-prepartion_time)}'  type ='redstone_torch'/> \n"
-        TNT_and_TRIGGERS += f"<DrawBlock x='{3}' y='48' z='{(-48-prepartion_time-1)}'  type ='tnt'/> \n"
+        TNT_and_TRIGGERS += f"<DrawBlock x='{3}' y='48' z='{(-prepartion_time)}'  type ='redstone_torch'/> \n"
+        TNT_and_TRIGGERS += f"<DrawBlock x='{3}' y='48' z='{(-prepartion_time-1)}'  type ='tnt'/> \n"
 
-    for i in range(-48,50):
+    for i in range(0,length):
         if odd:
             TNT_and_TRIGGERS += f"<DrawBlock x='{3 + num_of_repeater}' y='47' z='{i}' type ='stone'/> \n"
             TNT_and_TRIGGERS += f"<DrawBlock x='{3 + num_of_repeater}' y='48' z='{i}' face ='NORTH' type ='unpowered_repeater'/> \n"
@@ -45,8 +57,7 @@ def _get_tnt_and_triggers(prepartion_time = 25,interval_time = 35,step = 7):
     else:
         odd = True
 
-
-    for i in range(-48, 50, step):
+    for i in range(0, length, step):
         TNT_and_TRIGGERS += f"<DrawBlock x='-1' y='48' z='{i}' type='tnt'/> \n"
         TNT_and_TRIGGERS += f"<DrawBlock x='-0' y='48' z='{i}' type='tnt'/> \n"
         TNT_and_TRIGGERS += f"<DrawBlock x='1' y='48' z='{i}' type='tnt'/> \n"
@@ -70,12 +81,12 @@ def _get_tnt_and_triggers(prepartion_time = 25,interval_time = 35,step = 7):
 
 
 def GetXML():
-    TNT_and_TRIGGERS = _get_tnt_and_triggers()
+    """Returns the XML for the project"""
+    map_length = 60
 
-    with open("xml.txt", "w") as f:
-        f.write(TNT_and_TRIGGERS)
+    TNT_and_TRIGGERS = _get_tnt_and_triggers(length=map_length)
 
-    missionXML = '''<?xml version="1.0" encoding="UTF-8" standalone="no" ?>
+    missionXML = f'''<?xml version="1.0" encoding="UTF-8" standalone="no" ?>
                     <Mission xmlns="http://ProjectMalmo.microsoft.com" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
 
                         <About>
@@ -91,12 +102,12 @@ def GetXML():
                                 <Weather>clear</Weather>
                             </ServerInitialConditions>
                             <ServerHandlers>
-                                <FlatWorldGenerator generatorString="3;7,2;1;"/>
+                                <FlatWorldGenerator forceReset="true" generatorString="3;7,2;1;"/>
                                 <DrawingDecorator>
-                                    <DrawCuboid x1='-50' x2='50' y1='50' y2='50' z1='-50' z2='50' type='air'/>
-                                    <DrawCuboid x1='-1' x2='2' y1='49' y2='49' z1='-50' z2='50' type='grass'/>
-                                    <DrawCuboid x1='-1' x2='2' y1='48' y2='48' z1='-50' z2='50' type='air'/>
-                                    <DrawCuboid x1='-1' x2='2' y1='47' y2='47' z1='-50' z2='50' type='stone'/>''' + \
+                                    <DrawCuboid x1='-50' x2='50' y1='50' y2='50' z1='0' z2='{map_length}' type='air'/>
+                                    <DrawCuboid x1='-1' x2='2' y1='49' y2='49' z1='0' z2='{map_length}' type='grass'/>
+                                    <DrawCuboid x1='-1' x2='2' y1='48' y2='48' z1='0' z2='{map_length}' type='air'/>
+                                    <DrawCuboid x1='-1' x2='2' y1='47' y2='47' z1='0' z2='{map_length}' type='stone'/>''' + \
                  TNT_and_TRIGGERS + \
                  '''</DrawingDecorator>
                  <ServerQuitWhenAnyAgentFinishes/>
@@ -108,12 +119,10 @@ def GetXML():
          <AgentSection mode="Survival">
              <Name>CS175 mature AI demo</Name>
              <AgentStart>
-                 <Placement x="0.5" y="50" z="-49.5" pitch="45" yaw="0"/>
+                 <Placement x="0.5" y="50" z="0.5" pitch="45" yaw="0"/>
                  <Inventory>
                      <InventoryItem slot="0" type="diamond_pickaxe"/>
                      <InventoryItem slot="1" type="diamond_shovel"/>
-                     <InventoryItem slot="2" type="repeater"/>
-
                  </Inventory>
              </AgentStart>
              <AgentHandlers>
