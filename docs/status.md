@@ -3,6 +3,8 @@ layout: default
 title: Status
 ---
 
+<iframe width="560" height="315" src="https://www.youtube.com/watch?v=HdYuLv545YY" frameborder="0" allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+
 # Project Summary
 
 MatureAI is a survival game. The goal of this project is to train our agent to survive as long as possible and collects as many rewards as it can. We are inspired by the game Temple Run and would like to design a much more complex AI runner project with the help of the deep Q-Learning algorithm.  Our agent needs to collect golds and diamonds while running. When collecting rewards, our agent needs to bypass obstacles and not hit stones on both sides of the road. We are using use Redstone circuitry to create explosions and destroy the road as time goes by. At the same time, we will give our agent surviving time reward for moving forward.
