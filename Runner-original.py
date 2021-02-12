@@ -475,7 +475,7 @@ class MinecraftRunner(gym.Env):
     #                      </Mission>'''
     #
     #     return missionXML
-    def _get_tnt_and_triggers(slef, length=110, prepartion_time=50, interval_time=15, step=7):
+    def _get_tnt_and_triggers(self, length=110, prepartion_time=50, interval_time=15, step=7):
         """
             Generating XML for TNT and redstone triggers
             :Parameterms

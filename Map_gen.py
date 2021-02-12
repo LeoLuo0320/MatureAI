@@ -75,14 +75,14 @@ def _get_tnt_and_triggers(length = 110,prepartion_time = 50,interval_time = 15,s
             TNT_and_TRIGGERS += f"<DrawBlock x='{3}' y='48' z='{i}'  type ='redstone_wire'/> \n"
         odd = (odd != True)
     else: # adding destination block
-        TNT_and_TRIGGERS += f"<DrawBlock x='-1' y='49' z='{i+3}' type='diamond_block'/> \n"
-        TNT_and_TRIGGERS += f"<DrawBlock x='-0' y='49' z='{i+3}' type='diamond_block'/> \n"
-        TNT_and_TRIGGERS += f"<DrawBlock x='1' y='49' z='{i+3}' type='diamond_block'/> \n"
-        TNT_and_TRIGGERS += f"<DrawBlock x='2' y='49' z='{i+3}' type='diamond_block'/> \n"
-        TNT_and_TRIGGERS += f"<DrawBlock x='-1' y='49' z='{i+4}' type='diamond_block'/> \n"
-        TNT_and_TRIGGERS += f"<DrawBlock x='-0' y='49' z='{i+4}' type='diamond_block'/> \n"
-        TNT_and_TRIGGERS += f"<DrawBlock x='1' y='49' z='{i+4}' type='diamond_block'/> \n"
-        TNT_and_TRIGGERS += f"<DrawBlock x='2' y='49' z='{i+4}' type='diamond_block'/> \n"
+        TNT_and_TRIGGERS += f"<DrawBlock x='-1' y='49' z='{i+3}' type='emerald_block'/> \n"
+        TNT_and_TRIGGERS += f"<DrawBlock x='-0' y='49' z='{i+3}' type='emerald_block'/> \n"
+        TNT_and_TRIGGERS += f"<DrawBlock x='1' y='49' z='{i+3}' type='emerald_block'/> \n"
+        TNT_and_TRIGGERS += f"<DrawBlock x='2' y='49' z='{i+3}' type='emerald_block'/> \n"
+        TNT_and_TRIGGERS += f"<DrawBlock x='-1' y='49' z='{i+4}' type='emerald_block'/> \n"
+        TNT_and_TRIGGERS += f"<DrawBlock x='-0' y='49' z='{i+4}' type='emerald_block'/> \n"
+        TNT_and_TRIGGERS += f"<DrawBlock x='1' y='49' z='{i+4}' type='emerald_block'/> \n"
+        TNT_and_TRIGGERS += f"<DrawBlock x='2' y='49' z='{i+4}' type='emerald_block'/> \n"
     return TNT_and_TRIGGERS
 
 def _get_obstacles(obs_density, length):
@@ -111,7 +111,7 @@ def _get_obstacles(obs_density, length):
 
     return result
 
-def GetXML():
+def GetXML(obs_size =5):
     """Returns the XML for the project"""
     map_length = 81
     obs_density = 0.3
@@ -137,38 +137,52 @@ def GetXML():
                                 <FlatWorldGenerator forceReset="true" generatorString="3;7,2;1;"/>
                                 <DrawingDecorator>
                                     <DrawCuboid x1='-50' x2='50' y1='50' y2='50' z1='0' z2='{map_length}' type='air'/>
-                                    <DrawCuboid x1='-1' x2='2' y1='49' y2='49' z1='0' z2='{map_length}' type='grass'/>
                                     <DrawCuboid x1='-1' x2='2' y1='48' y2='48' z1='0' z2='{map_length}' type='air'/>
-                                    <DrawCuboid x1='-1' x2='2' y1='47' y2='47' z1='0' z2='{map_length}' type='stone'/>''' + \
-                 TNT_and_TRIGGERS + obs +\
-                 '''</DrawingDecorator>
-                 <ServerQuitWhenAnyAgentFinishes/>
-                 <ServerQuitFromTimeUp timeLimitMs="1000000"/>
-                 <ServerQuitWhenAnyAgentFinishes/>
-             </ServerHandlers>
-         </ServerSection>
+                                    <DrawCuboid x1='-1' x2='2' y1='49' y2='49' z1='0' z2='{map_length}' type='diamond_block'/>
+                                    <DrawCuboid x1='-2' x2='-2' y1='49' y2='50' z1='0' z2='{map_length}' type='stone'/>
+                                    <DrawCuboid x1='3' x2='3' y1='49' y2='50' z1='0' z2='{map_length}' type='stone'/>
+                                    <DrawCuboid x1='-1' x2='2' y1='49' y2='50' z1='-1' z2='-1' type='stone'/>
+                                    <DrawCuboid x1='-1' x2='2' y1='47' y2='47' z1='0' z2='{map_length}' type='stone'/>'''  +\
+                                    TNT_and_TRIGGERS + \
+                                    obs +\
+                                '''</DrawingDecorator>
+                                    <ServerQuitWhenAnyAgentFinishes/>
+                                    <ServerQuitFromTimeUp timeLimitMs="1000000"/>
+                                    <ServerQuitWhenAnyAgentFinishes/>
+                             </ServerHandlers>
+                        </ServerSection>
 
-         <AgentSection mode="Survival">
-             <Name>CS175 mature AI demo</Name>
-             <AgentStart>
-                 <Placement x="0.5" y="50" z="0.5" pitch="45" yaw="0"/>
-                 <Inventory>
-                     <InventoryItem slot="0" type="diamond_pickaxe"/>
-                     <InventoryItem slot="1" type="diamond_shovel"/>
-                 </Inventory>
-             </AgentStart>
-             <AgentHandlers>
-                 <ContinuousMovementCommands/>
-                 <VideoProducer>
-                     <Width>''' + str(video_width) + '''</Width>
-                                     <Height>''' + str(video_height) + '''</Height>
-                                 </VideoProducer>
-                                 <AgentQuitFromTouchingBlockType>
-                                    <Block type="stone" />
-                                 </AgentQuitFromTouchingBlockType>
-                             </AgentHandlers>
-                         </AgentSection>
-                     </Mission>'''
+                         <AgentSection mode="Survival">
+                            <Name>CS175 mature AI demo</Name>
+                            <AgentStart>
+                                <Placement x="0.5" y="50" z="0.5" pitch="45" yaw="0"/>
+                            <Inventory>
+                                <InventoryItem slot="0" type="diamond_pickaxe"/>
+                                <InventoryItem slot="1" type="diamond_shovel"/>
+                            </Inventory>
+                            </AgentStart>
+                             <AgentHandlers>
+                                    <DiscreteMovementCommands/>
+                                    <RewardForTouchingBlockType>
+                                        <Block type='emerald_block' reward='10'/>
+                                        <Block type="stone" reward='-1'/>
+                                    </RewardForTouchingBlockType>
+                                    <RewardForTimeTaken initialReward='0' delta='0.05' density='MISSION_END' />
+                                    <ObservationFromFullStats/>
+                                    <ObservationFromRay/>
+                                    <ObservationFromGrid>
+                                        <Grid name="floorAll">
+                                            <min x="-'''+str(int(obs_size/2))+'''" y="-1" z="-'''+str(int(obs_size/2))+'''"/>
+                                            <max x="'''+str(int(obs_size/2))+'''" y="0" z="'''+str(int(obs_size/2))+'''"/>
+                                        </Grid>
+                                    </ObservationFromGrid>
+                                    <AgentQuitFromReachingCommandQuota total="'''+str(self.max_episode_steps)+'''" />
+                                    <AgentQuitFromTouchingBlockType>
+                                        <Block type="emerald_block" />
+                                    </AgentQuitFromTouchingBlockType>
+                                </AgentHandlers>
+                            </AgentSection>
+                        </Mission>'''
 
     return missionXML
 
