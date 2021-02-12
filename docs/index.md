@@ -3,7 +3,7 @@ layout: default
 title:  Home
 ---
 
-# Source code: https://github.com/haodonq/MatureAI
+# Source code: [Github Repository](https://github.com/haodonq/MatureAI)
 
 # Reports:
 - [Proposal](proposal.html)
