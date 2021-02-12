@@ -51,12 +51,12 @@ Based on the reward system described in Approach and logic designed above, we ha
 
 <img width="700" alt="reward-graph" src="reward.png">
 
-To evaluate our model qualitatively, we will keep track of the action taken by our agent. It is expected to survive as long as possible, which means that our agent should bypass obstacles and avoid hitting stones on both sides of the road, without taking greate risk of dying.
+To evaluate our model qualitatively, we will keep track of the action taken by our agent. It is expected to survive as long as possible, which means that our agent should bypass obstacles and avoid hitting stones on both sides of the road, without taking greater risk of dying.
 
 # Remaining Goals and Challenges
 
 ## Remaining Goals
-n the next four weeks, we will change discrete action space to continuous action space as our environment will get more complex. For now, we make a simple map to ensure our agent will avoid hitting obstacles and collect golds. In the final version, we will design more complex maps for the agent and add more types of obstacles.  At the same time, our ambition is to use raw pixels instead of world state observation. This requires color segmentation and distance estimation, which are the main challenge we face in the next few weeks. 
+In the next four weeks, we will change discrete action space to continuous action space as our environment will get more complex. For now, we make a simple map to ensure our agent will avoid hitting obstacles and collect golds. In the final version, we will design more complex maps for the agent and add more types of obstacles.  At the same time, our ambition is to use raw pixels instead of world state observation. This requires color segmentation and distance estimation, which are the main challenge we face in the next few weeks. 
 
 ## Challenges
 When we try to use computer vision and raw pixels, we realize that it is more complex than we initially thought.  The first challenge is using computer vision to detect surrounding objects. We will implement a color segmentation method to quickly detect the boundary of each object, and separate them using different colors. We need to be careful when setting threshold values because the colors of some single blocks are composed of multiple colors, and we need to treat them as a whole and replace them with the same color. The second challenge is to use computer vision to detect obstacles. When trying to implement computer vision with opencv, we have to find the distance obstacles and our agent, then reflect this distance in our map. This step requires careful calculation so our agent will know exactly where the obstacles lie. 
