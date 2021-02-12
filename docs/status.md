@@ -11,15 +11,40 @@ MatureAI is a survival game. The goal of this project is to train our agent to s
 
 # Approach
 
-Since the environment is fast and the model is not too large, we use PPO trainer with default parameters from rllib for reinforcement learning. The trainer class helps us train, checkpoint model, and compute actions. Please see the image attached below as a reference to how the trainer works.
+Since  our environment relatively small right now, we use PPO trainer with default parameters from rllib for reinforcement learning. The trainer class helps us train, checkpoint model, and compute actions. Please see the image attached below as a reference to how the trainer works.
 
 <img width="700" alt="ppo trainer - graph" src="rllib.png">
 
+Each observation is a Numpy array of size 5 X 5 X 2. When facing a gate, the agent will either open it or make it remain unopened. Our goal is to train our agent to open the gate each time it encounters one. If our agent did not not open it, it could not move forward and enter next area ahead. To imitate the basic game logic of Temple Run and help our agent learn to move forward, we set a time limit for TNT that under each area. If the time is up, TNT will explode, and the agent will fall off the track and die. 
 
-=======
-Each observation is a Numpy array of size 5 X 5 X 2. When facing a gate, the agent will either open it or make it remain unopened. Our goal is to train our agent to open the gate each time it encounters one. If our agent did not not open it, he could not move forward and enter next area ahead. To imitate the basic game logic of Temple Run and help our agent learn to move forward, we set a time limit for TNT that under each area. If the time is up, TNT will explode, and the agent will fall off the track and die. 
-#### Action Space
-The action space is similar to that from assignment2, and we use discrete action space for now, as the environment is straightforward and simple. The use 1 in action space is to open the gate, so our agent will be able to move forward. 
+
+
+### Obstacle Types
+
+Currently we designed 4 levels of difficulty: Trainee, Introductory, Medium, and Advance. For the status report we will only handle the trainee level.
+
+Trainee: It only contains fence gate. The agent needs to open the gate and walk through the gate.
+
+<img src="obs_0.JPG" alt="obs_0" style="zoom: 33%;" />
+
+Introductory: It will contain fence gate and level 1 obstacle as show below. The agent needs to step onto the slab and jump.
+
+<img src="obs_1.JPG" alt="obs_1" style="zoom:33%;" />
+
+
+
+Medium: It will contain fence gate, level 1 obstacle and level 2 obstacles as show below. The agent needs to step onto the slab and jump with certain acceleration.
+
+<img src="obs_2.JPG" alt="obs_2" style="zoom:33%;" />
+
+
+
+Advance: It will contain all obstacles above and the agent needs to step onto the slab and jump with maximum acceleration.
+
+<img src="obs_3.JPG" alt="obs_3" style="zoom:33%;" />
+
+### Action Space
+The action space is similar to the one from assignment2, and we use discrete action space for now, since environment is straightforward and simple. The "use 1" in action right now is to open the gate, so our agent will be able to move forward. 
 ```
 self.action_dict = {
     0: 'move 1',  # Move one block forward
@@ -29,7 +54,8 @@ self.action_dict = {
 }
 ```
 
-#### Reward
+### Reward
+
 As we need to evaluate performance based on survival time, we implemented the reward XML code in this way. 
 ```
 <RewardForTimeTaken initialReward='0' delta='0.05' density='MISSION_END' />
