@@ -15,8 +15,9 @@ Since the environment is fast and the model is not too large, we use PPO trainer
 
 <img width="700" alt="ppo trainer - graph" src="rllib.png">
 
-Each observation is a NumPy array of size 5 X 5 X 2. When facing a gate, the agent will either open it or make it remain locked. Our goal is to train our agent to open the gate each time it encounters one. If our agent did not open the gate, he might not be able to move forward and will trigger TNT as he stays in a certain area for a long time. 
 
+=======
+Each observation is a Numpy array of size 5 X 5 X 2. When facing a gate, the agent will either open it or make it remain unopened. Our goal is to train our agent to open the gate each time it encounters one. If our agent did not not open it, he could not move forward and enter next area ahead. To imitate the basic game logic of Temple Run and help our agent learn to move forward, we set a time limit for TNT that under each area. If the time is up, TNT will explode, and the agent will fall off the track and die. 
 #### Action Space
 The action space is similar to that from assignment2, and we use discrete action space for now, as the environment is straightforward and simple. The use 1 in action space is to open the gate, so our agent will be able to move forward. 
 ```
@@ -33,7 +34,7 @@ As we need to evaluate performance based on survival time, we implemented the re
 ```
 <RewardForTimeTaken initialReward='0' delta='0.05' density='MISSION_END' />
 ```
-Using RewardForTimeTaken, we are able to measure the exact survival time of our agent, and therefore give it a reward when the mission end. Because Minecraft uses ticks to measure time, which is 1/20 seconds in the real world, we set delta = 0.05, so the agent will have one positive survival reward per second. 
+Using RewardForTimeTaken flag, we are able to measure the exact survival time of our agent, and therefore give it a reward when the mission end. Because Minecraft uses ticks to measure time, which is 1/20 seconds in the real world, we set delta = 0.05, so the agent will have one positive survival reward per second. 
 
 # Evaluation
 To evaluate our model quantitatively, we set positive and negative rewards for touching specific blocks. We will evaluate the performance of our agent based on the cumulative value returned by our agent. Please see the code snip for details. 
@@ -50,7 +51,7 @@ Based on the reward system described in Approach and logic designed above, we ha
 
 <img width="700" alt="reward-graph" src="reward.png">
 
-To evaluate our model qualitatively, we will keep track of the action taken by our agent. It is expected to survive as long as possible, which means that our agent should bypass obstacles and avoid hitting stones on both sides of the road, without taking a greater risk of dying.
+To evaluate our model qualitatively, we will keep track of the action taken by our agent. It is expected to survive as long as possible, which means that our agent should bypass obstacles and avoid hitting stones on both sides of the road, without taking greate risk of dying.
 
 # Remaining Goals and Challenges
 
