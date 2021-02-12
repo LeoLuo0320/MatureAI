@@ -11,6 +11,7 @@ Reports:
 - [Status](status.html)
 - [Final](final.html)
 
+<img width="1000" alt="ppo trainer - graph" src="cover.png">
 
 # Project Summury
 MatureAI is a survival game. The goal of this project is training our agent to survive as long as possible and collect as many rewards as it can. We are inspired by the game Temple Run and would like to design a much more complex AI runner project with the help of deep Q-Learning algorithm. 
