@@ -8,6 +8,22 @@ MatureAI is a survival game. The goal of this project is training our agent to s
 Our agent needs to collect golds and diamonds while running. When collecting rewards, it also needs to bypass obstacles and not to hit stones on both sides of the road. In the future, we will use Redstone circuitry to create explosion and destroy the road as punishment. At the same time, we will give our agent surviving time reward for moving forward.
 
 # Approach
+Since the environment is fast and the model is not too large, we use PPO trainer from rllib for reinforcement learning. The trainer class helps us train, checkpoint model, and compute actions. Please see the image attached below as a reference of how the trainer works. 
+
+<img width="700" alt="ppo trainer - graph" src="https://need_graph_here">
+
+Each observation is a NumPy array of size 5 X 5 X 2. When facing a gate, the agent will either open it or make it remain locked. Our goal is to train our agent to open the gate each time it encounters one. If it does not open it, he might not be able to move forward and will trigger TNT as he stays in a certain area for a long time. 
+
+### Action Space
+The action space is similar to that from assignment2, and we use discrete action space for now, as the environment is straightforward and simple. The use 1 in action space is to open the gate, so our agent will be able to move forward. 
+```
+self.action_dict = {
+    0: 'move 1',  # Move one block forward
+    1: 'use 1',   # Open the gate 
+    2: 'turn 1',  # Turn 90 degrees to the right
+    3: 'turn -1'  # Turn 90 degrees to the left
+}
+```
 
 # Evaluation
 To evaluate our model quantitatively, we set positive and negative rewards for touching specific blocks. We will evaluate the performance of our agent based on the cumulative value returned by our agent. Please see the code snip for details. 
@@ -19,6 +35,13 @@ To evaluate our model quantitatively, we set positive and negative rewards for t
   <Block type='jungle_fence_gate' reward='-1'/>
 </RewardForTouchingBlockType>
 ```
+
+At the same time, as we need to evaluate performance based on survival time, we implemented the reward XML code in this way. 
+```
+<RewardForTimeTaken initialReward='0' delta='0.05' density='MISSION_END' />
+```
+Using RewardForTimeTaken, we are able to measure the exact survival time of our agent, and therefore give it a reward when the mission end. Because Minecraft uses ticks to measure time, which is 1/20 seconds in the real world, we set delta = 0.05, so the agent will have one positive survival reward per second. 
+
 Based on the logic designed above, we have the reward graph below. According to the graph, we could see that our agent is learning to grab golds and diamonds and avoid hitting obstacles. 
 
 <img width="700" alt="reward-graph" src="https://need_graph_here">
@@ -38,6 +61,7 @@ The second challenge is to use computer vision to detect obstacles. When trying 
 
 # Resources Used
 - [OpenCV](https://opencv.org/)
+- [RLlib](https://docs.ray.io/en/master/rllib-training.html)
 - Malmo Tutorial
 - Assignment 2
 - Stack Overflow
