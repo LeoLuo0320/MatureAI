@@ -12,7 +12,7 @@ Since the environment is fast and the model is not too large, we use PPO trainer
 
 <img width="700" alt="ppo trainer - graph" src="rllib.png">
 
-Each observation is a NumPy array of size 5 X 5 X 2. When facing a gate, the agent will either open it or make it remain locked. Our goal is to train our agent to open the gate each time it encounters one. If it does not open it, he might not be able to move forward and will trigger TNT as he stays in a certain area for a long time. 
+Each observation is a NumPy array of size 5 X 5 X 2. When facing a gate, the agent will either open it or make it remain locked. Our goal is to train our agent to open the gate each time it encounters one. If it does not open it, he cannot move forward and enter next area ahead. To imitate the basic game logic of Temple Run and help our agent learn to move forward, we set a time limit for TNT that under each area. If the time is up, TNT will explode, and the agent will fall off the track and die. 
 
 #### Action Space
 The action space is similar to that from assignment2, and we use discrete action space for now, as the environment is straightforward and simple. The use 1 in action space is to open the gate, so our agent will be able to move forward. 
@@ -47,7 +47,7 @@ Based on the reward system described in Approach and logic designed above, we ha
 
 <img width="700" alt="reward-graph" src="reward.png">
 
-To evaluate our model Qualitatively, we will keep track of the action taken by our agent. It is expected to survive as long as possible, which means that our agent should bypass obstacles and avoid hitting stones on boths sides of the road, which will trigger TNT in the future version. At the same time, it will collect gold and diamond as much as possible, without taking greate risk of dying.
+To evaluate our model Qualitatively, we will keep track of the action taken by our agent. It is expected to survive as long as possible, which means that our agent should bypass obstacles and avoid hitting stones on boths sides of the road, which will trigger TNT in the future version. For now, We set a time limit for bombs in differentarea and detonate when the time is up. At the same time, our agent should learn to collect gold and diamond as much as possible, without taking greate risk of dying.
 
 # Remaining Goals and Challenges
 
