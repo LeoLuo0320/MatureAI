@@ -4,15 +4,18 @@ title: Status
 ---
 
 # Project Summary
-MatureAI is a survival game. The goal of this project is training our agent to survive as long as possible and collect as many rewards as it can. We are inspired by the game Temple Run and would like to design a much more complex AI runner project with the help of deep Q-Learning algorithm. 
-Our agent needs to collect golds and diamonds while running. When collecting rewards, it also needs to bypass obstacles and not to hit stones on both sides of the road. In the future, we will use Redstone circuitry to create explosion and destroy the road as punishment. At the same time, we will give our agent surviving time reward for moving forward.
+
+MatureAI is a survival game. The goal of this project is to train our agent to survive as long as possible and collects as many rewards as it can. We are inspired by the game Temple Run and would like to design a much more complex AI runner project with the help of the deep Q-Learning algorithm.  Our agent needs to collect golds and diamonds while running. When collecting rewards, our agent needs to bypass obstacles and not hit stones on both sides of the road. We are using use Redstone circuitry to create explosions and destroy the road as time goes by. At the same time, we will give our agent surviving time reward for moving forward.
+
+
 
 # Approach
-Since the environment is fast and the model is not too large, we use PPO trainer with default parameters from rllib for reinforcement learning. The trainer class helps us train, checkpoint model, and compute actions. Please see the image attached below as a reference of how the trainer works. 
+
+Since the environment is fast and the model is not too large, we use PPO trainer with default parameters from rllib for reinforcement learning. The trainer class helps us train, checkpoint model, and compute actions. Please see the image attached below as a reference to how the trainer works.
 
 <img width="700" alt="ppo trainer - graph" src="rllib.png">
 
-Each observation is a NumPy array of size 5 X 5 X 2. When facing a gate, the agent will either open it or make it remain locked. Our goal is to train our agent to open the gate each time it encounters one. If it does not open it, he might not be able to move forward and will trigger TNT as he stays in a certain area for a long time. 
+Each observation is a NumPy array of size 5 X 5 X 2. When facing a gate, the agent will either open it or make it remain locked. Our goal is to train our agent to open the gate each time it encounters one. If our agent did not open the gate, he might not be able to move forward and will trigger TNT as he stays in a certain area for a long time. 
 
 #### Action Space
 The action space is similar to that from assignment2, and we use discrete action space for now, as the environment is straightforward and simple. The use 1 in action space is to open the gate, so our agent will be able to move forward. 
@@ -47,18 +50,15 @@ Based on the reward system described in Approach and logic designed above, we ha
 
 <img width="700" alt="reward-graph" src="reward.png">
 
-To evaluate our model Qualitatively, we will keep track of the action taken by our agent. It is expected to survive as long as possible, which means that our agent should bypass obstacles and avoid hitting stones on boths sides of the road, which will trigger TNT in the future version. At the same time, it will collect gold and diamond as much as possible, without taking greate risk of dying.
+To evaluate our model qualitatively, we will keep track of the action taken by our agent. It is expected to survive as long as possible, which means that our agent should bypass obstacles and avoid hitting stones on both sides of the road, without taking a greater risk of dying.
 
 # Remaining Goals and Challenges
 
 ## Remaining Goals
-In the next four weeks, we will change discrete action space to continuous action space as our environment will get more complex. For now, we make a simple map to ensure our agent will avoid hitting obstacles and collect golds. In the final version, we will design more complex maps for the agent and add more types of obstacles. 
-At the same time, our ambition is to use raw pixel instead of world state observation. This requires color segmentation and distance estimation, which are the main challenge we face in the next few weeks. 
+n the next four weeks, we will change discrete action space to continuous action space as our environment will get more complex. For now, we make a simple map to ensure our agent will avoid hitting obstacles and collect golds. In the final version, we will design more complex maps for the agent and add more types of obstacles.  At the same time, our ambition is to use raw pixels instead of world state observation. This requires color segmentation and distance estimation, which are the main challenge we face in the next few weeks. 
 
 ## Challenges
-When we try to use computer vision and raw pixels, we realize that it is more complex than we initially thought. 
-The first challenge is using computer vision to detect surrounding objects. We will implement a color segmentation method to quickly detect the boundary of each object, and separate them using different colors. We need to be really careful when setting threshold values, because colors of some single blocks are composed of multiple colors, and we need to treat them as a whole and replace them with the same color.
-The second challenge is to use computer vision to detect obstacles. When trying to implement computer vision with opencv, we have to find the distance obstacles and our agent, then reflect this distance in our map. This step requires careful calculation so our agent will know exactly where the obstacles lie. 
+When we try to use computer vision and raw pixels, we realize that it is more complex than we initially thought.  The first challenge is using computer vision to detect surrounding objects. We will implement a color segmentation method to quickly detect the boundary of each object, and separate them using different colors. We need to be careful when setting threshold values because the colors of some single blocks are composed of multiple colors, and we need to treat them as a whole and replace them with the same color. The second challenge is to use computer vision to detect obstacles. When trying to implement computer vision with opencv, we have to find the distance obstacles and our agent, then reflect this distance in our map. This step requires careful calculation so our agent will know exactly where the obstacles lie. 
 
 # Resources Used
 - [OpenCV](https://opencv.org/)
