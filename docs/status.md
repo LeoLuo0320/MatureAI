@@ -3,7 +3,9 @@ layout: default
 title: Status
 ---
 
-<iframe width="560" height="315" src="https://www.youtube.com/watch?v=HdYuLv545YY" frameborder="0" allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+# Video Summury
+Video Link: [MatureAI Presentation](https://youtu.be/HdYuLv545YY)
+<iframe width="560" height="315" src="https://www.youtube.com/embed/HdYuLv545YY" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
 
 # Project Summary
 
