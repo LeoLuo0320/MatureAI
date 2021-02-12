@@ -11,7 +11,7 @@ MatureAI is a survival game. The goal of this project is to train our agent to s
 
 # Approach
 
-Since  our environment relatively small right now, we use PPO trainer with default parameters from rllib for reinforcement learning. The trainer class helps us train, checkpoint model, and compute actions. Please see the image attached below as a reference to how the trainer works.
+Given our relatively simple environment, we are using PPO trainer with default parameters from rllib for reinforcement learning. The trainer class helps us train, checkpoint model, and compute actions. Please see the image attached below as a reference to how the trainer works.
 
 <p align="center">
 <img width="700" alt="ppo trainer - graph" src="rllib.png">
