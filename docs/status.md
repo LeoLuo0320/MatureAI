@@ -10,7 +10,7 @@ Our agent needs to collect golds and diamonds while running. When collecting rew
 # Approach
 Since the environment is fast and the model is not too large, we use PPO trainer from rllib for reinforcement learning. The trainer class helps us train, checkpoint model, and compute actions. Please see the image attached below as a reference of how the trainer works. 
 
-<img width="700" alt="ppo trainer - graph" src="https://need_graph_here">
+<img width="700" alt="ppo trainer - graph" src="rllib.png">
 
 Each observation is a NumPy array of size 5 X 5 X 2. When facing a gate, the agent will either open it or make it remain locked. Our goal is to train our agent to open the gate each time it encounters one. If it does not open it, he might not be able to move forward and will trigger TNT as he stays in a certain area for a long time. 
 
@@ -44,7 +44,7 @@ Using RewardForTimeTaken, we are able to measure the exact survival time of our 
 
 Based on the logic designed above, we have the reward graph below. According to the graph, we could see that our agent is learning to grab golds and diamonds and avoid hitting obstacles. 
 
-<img width="700" alt="reward-graph" src="https://need_graph_here">
+<img width="700" alt="reward-graph" src="reward.png">
 
 To evaluate our model Qualitatively, we will keep track of the action taken by our agent. It is expected to survive as long as possible, which means that our agent should bypass obstacles and avoid hitting stones on boths sides of the road, which will trigger TNT in the future version. At the same time, it will collect gold and diamond as much as possible, without taking greate risk of dying.
 
