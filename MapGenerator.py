@@ -14,8 +14,8 @@ def _get_tnt_and_triggers(length=110, prepartion_time=50, interval_time=15, step
             after 1 second, the first TNT will be ignited, and after 4 second
             the first TNT will explode
             interval_time : The interval time for two rows TNT to be ignited
-             step: number of block between two rows of TNT
-             length : indicating the length of the map
+            step: number of block between two rows of TNT
+            length : indicating the length of the map
     """
     TNT_and_TRIGGERS = ""
     odd = True
@@ -74,9 +74,14 @@ def _get_tnt_and_triggers(length=110, prepartion_time=50, interval_time=15, step
     return TNT_and_TRIGGERS
 
 
-def _get_obstacles(obs_density, length):
+def _get_obstacles(obs_density, length, difficulty= 0):
+    '''
+    :param obs_density: density of obstacle given the length of the map
+    :param length: used by obs_density
+    :param difficulty: 0 means easy, nonezeros will have stone_slab and fence
+    '''
     assert 0 < obs_density <= 0.3
-    obs_types = {1: "jungle_fence_gate"}
+    obs_types = {1: "jungle_fence_gate"} if difficulty == 0 else {1: "jungle_fence_gate", 2: ["stone_slab", "fence"]}
 
     result = ""
     obs_num = int(length * obs_density)
@@ -87,16 +92,16 @@ def _get_obstacles(obs_density, length):
         roll = np.random.choice(list(obs_types.keys()))
         obs = obs_types[roll]
         if type(obs) != list:
-            result += f"<DrawBlock x='-1' y='50' z='{choices[i][1]}' type='{obs_types[roll]}'/> \n"
-            result += f"<DrawBlock x='0' y='50' z='{choices[i][1]}' type='{obs_types[roll]}'/> \n"
-            result += f"<DrawBlock x='1' y='50' z='{choices[i][1]}' type='{obs_types[roll]}'/> \n"
-            result += f"<DrawBlock x='2' y='50' z='{choices[i][1]}' type='{obs_types[roll]}'/> \n"
+            row = np.random.choice(choices[i])  # we will spawn gate from range(0 - 4)
+            result += f"<DrawBlock x='-1' y='50' z='{row}' type='{obs_types[roll]}'/> \n"
+            result += f"<DrawBlock x='0' y='50' z='{row}' type='{obs_types[roll]}'/> \n"
+            result += f"<DrawBlock x='1' y='50' z='{row}' type='{obs_types[roll]}'/> \n"
+            result += f"<DrawBlock x='2' y='50' z='{row}' type='{obs_types[roll]}'/> \n"
         else:
+            fence_gap = np.random.choice([0, 1, 2])
             for j in range(-1, 3):
                 result += f"<DrawBlock x='{j}' y='50' z='{choices[i][0]}' type='{obs_types[roll][0]}'/> \n"
-                result += f"<DrawBlock x='{j}' y='50' z='{choices[i][1]}' type='{obs_types[roll][1]}'/> \n"
-                result += f"<DrawBlock x='{j}' y='50' z='{choices[i][2]}' type='{obs_types[roll][2]}'/> \n"
-
+                result += f"<DrawBlock x='{j}' y='50' z='{choices[i][1] + fence_gap}' type='{obs_types[roll][1]}'/> \n"
     return result
 
 def Map():

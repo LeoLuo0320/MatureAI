@@ -58,9 +58,9 @@ def _get_tnt_and_triggers(length = 110,prepartion_time = 50,interval_time = 15,s
         odd = True
 
     for i in range(0, length, step):
-        TNT_and_TRIGGERS += f"<DrawBlock x='-1' y='48' z='{i}' type='tnt'/> \n"
-        TNT_and_TRIGGERS += f"<DrawBlock x='-0' y='48' z='{i}' type='tnt'/> \n"
-        TNT_and_TRIGGERS += f"<DrawBlock x='1' y='48' z='{i}' type='tnt'/> \n"
+        # TNT_and_TRIGGERS += f"<DrawBlock x='-1' y='48' z='{i}' type='tnt'/> \n"
+        # TNT_and_TRIGGERS += f"<DrawBlock x='-0' y='48' z='{i}' type='tnt'/> \n"
+        # TNT_and_TRIGGERS += f"<DrawBlock x='1' y='48' z='{i}' type='tnt'/> \n"
         # TNT_and_TRIGGERS += f"<DrawBlock x='2' y='48' z='{i}' type='tnt'/> \n"
         for j in range(num_of_repeater):
             TNT_and_TRIGGERS += f"<DrawBlock x='{3+j}' y='47' z='{i}' type='stone'/> \n"
@@ -85,35 +85,36 @@ def _get_tnt_and_triggers(length = 110,prepartion_time = 50,interval_time = 15,s
         TNT_and_TRIGGERS += f"<DrawBlock x='2' y='49' z='{i+4}' type='emerald_block'/> \n"
     return TNT_and_TRIGGERS
 
-def _get_obstacles(obs_density, length):
+def _get_obstacles(obs_density, length, difficulty= 1):
 
     assert 0 < obs_density <= 0.3
-    obs_types = {1:"jungle_fence_gate", 2:["stone_slab","fence","stone_slab"]}
+    obs_types = {1:"jungle_fence_gate"} if difficulty == 0 else {1:"jungle_fence_gate", 2:["stone_slab","fence"]}
 
     result = ""
     obs_num = int(length * obs_density)
-    choices = np.arange(1, length, dtype=np.int32).reshape(-1,5)
+    choices = np.arange(1, length, dtype=np.int32).reshape(-1, 5)
     choices = np.random.permutation(choices)[:obs_num]
 
     for i in range(choices.shape[0]):
         roll = np.random.choice(list(obs_types.keys()))
         obs = obs_types[roll]
         if type(obs) != list:
-            result += f"<DrawBlock x='-1' y='50' z='{choices[i][1]}' type='{obs_types[roll]}'/> \n"
-            result += f"<DrawBlock x='0' y='50' z='{choices[i][1]}' type='{obs_types[roll]}'/> \n"
-            result += f"<DrawBlock x='1' y='50' z='{choices[i][1]}' type='{obs_types[roll]}'/> \n"
-            result += f"<DrawBlock x='2' y='50' z='{choices[i][1]}' type='{obs_types[roll]}'/> \n"
+            row = np.random.choice(choices[i]) # we will spawn gate from range(0 - 4)
+            result += f"<DrawBlock x='-1' y='50' z='{row}' type='{obs_types[roll]}'/> \n"
+            result += f"<DrawBlock x='0' y='50' z='{row}' type='{obs_types[roll]}'/> \n"
+            result += f"<DrawBlock x='1' y='50' z='{row}' type='{obs_types[roll]}'/> \n"
+            result += f"<DrawBlock x='2' y='50' z='{row}' type='{obs_types[roll]}'/> \n"
         else:
-            for j in range(-1,3):
+            fence_gap = np.random.choice([0, 1, 2])
+            for j in range(-1, 3):
                 result += f"<DrawBlock x='{j}' y='50' z='{choices[i][0]}' type='{obs_types[roll][0]}'/> \n"
-                result += f"<DrawBlock x='{j}' y='50' z='{choices[i][1]}' type='{obs_types[roll][1]}'/> \n"
-                result += f"<DrawBlock x='{j}' y='50' z='{choices[i][2]}' type='{obs_types[roll][2]}'/> \n"
+                result += f"<DrawBlock x='{j}' y='50' z='{choices[i][1]+fence_gap}' type='{obs_types[roll][1]}'/> \n"
 
     return result
 
 def GetXML(obs_size =5):
     """Returns the XML for the project"""
-    map_length = 81
+    map_length = 51
     obs_density = 0.3
     TNT_and_TRIGGERS = _get_tnt_and_triggers(length=map_length)
     obs = _get_obstacles(obs_density, map_length)
@@ -176,7 +177,7 @@ def GetXML(obs_size =5):
                                             <max x="'''+str(int(obs_size/2))+'''" y="0" z="'''+str(int(obs_size/2))+'''"/>
                                         </Grid>
                                     </ObservationFromGrid>
-                                    <AgentQuitFromReachingCommandQuota total="'''+str(self.max_episode_steps)+'''" />
+                                    <AgentQuitFromReachingCommandQuota total="'''+"1000"+'''" />
                                     <AgentQuitFromTouchingBlockType>
                                         <Block type="emerald_block" />
                                     </AgentQuitFromTouchingBlockType>
