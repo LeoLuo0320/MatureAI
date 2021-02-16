@@ -86,35 +86,44 @@ def _get_tnt_and_triggers(length = 110,prepartion_time = 50,interval_time = 15,s
     return TNT_and_TRIGGERS
 
 def _get_obstacles(obs_density, length, difficulty= 1):
-
+    '''
+    :param obs_density: density of obstacle given the length of the map
+    :param length: used by obs_density
+    :param difficulty: 0 means easy, nonezeros will have stone_slab and fence
+    '''
     assert 0 < obs_density <= 0.3
-    obs_types = {1:"jungle_fence_gate"} if difficulty == 0 else {1:"jungle_fence_gate", 2:["stone_slab","fence"]}
+    obs_types = {1: "jungle_fence_gate"} if difficulty == 0 else {1: "jungle_fence_gate", 2: ["stone_slab", "fence"]}
 
     result = ""
     obs_num = int(length * obs_density)
-    choices = np.arange(1, length, dtype=np.int32).reshape(-1, 5)
+    choices = np.arange(2, length, dtype=np.int32).reshape(-1, 5)
     choices = np.random.permutation(choices)[:obs_num]
 
     for i in range(choices.shape[0]):
+        diamon_placement = np.random.choice([-1, 0 , 1, 2])
         roll = np.random.choice(list(obs_types.keys()))
         obs = obs_types[roll]
         if type(obs) != list:
-            row = np.random.choice(choices[i]) # we will spawn gate from range(0 - 4)
+            row = np.random.choice(choices[i])  # we will spawn gate from range(0 - 4)
             result += f"<DrawBlock x='-1' y='50' z='{row}' type='{obs_types[roll]}'/> \n"
             result += f"<DrawBlock x='0' y='50' z='{row}' type='{obs_types[roll]}'/> \n"
             result += f"<DrawBlock x='1' y='50' z='{row}' type='{obs_types[roll]}'/> \n"
             result += f"<DrawBlock x='2' y='50' z='{row}' type='{obs_types[roll]}'/> \n"
+            result += f"<DrawItem x='{diamon_placement}' y='50' z='{row+1}' type='diamond' /> \n"
+
         else:
             fence_gap = np.random.choice([0, 1, 2])
             for j in range(-1, 3):
                 result += f"<DrawBlock x='{j}' y='50' z='{choices[i][0]}' type='{obs_types[roll][0]}'/> \n"
-                result += f"<DrawBlock x='{j}' y='50' z='{choices[i][1]+fence_gap}' type='{obs_types[roll][1]}'/> \n"
-
+                result += f"<DrawBlock x='{j}' y='50' z='{choices[i][1] + fence_gap}' type='{obs_types[roll][1]}'/> \n"
+                result += f"<DrawItem x='{diamon_placement}' y='50' z='{choices[i][1] + fence_gap + 1}' type='diamond' /> \n"
     return result
 
 def GetXML(obs_size =5):
     """Returns the XML for the project"""
     map_length = 51
+    assert (map_length -2) % 5 == 0
+
     obs_density = 0.3
     TNT_and_TRIGGERS = _get_tnt_and_triggers(length=map_length)
     obs = _get_obstacles(obs_density, map_length)

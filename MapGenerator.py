@@ -85,10 +85,11 @@ def _get_obstacles(obs_density, length, difficulty= 0):
 
     result = ""
     obs_num = int(length * obs_density)
-    choices = np.arange(1, length, dtype=np.int32).reshape(-1, 5)
+    choices = np.arange(2, length, dtype=np.int32).reshape(-1, 5)
     choices = np.random.permutation(choices)[:obs_num]
 
     for i in range(choices.shape[0]):
+        diamon_placement = np.random.choice([-1, 0 , 1, 2])
         roll = np.random.choice(list(obs_types.keys()))
         obs = obs_types[roll]
         if type(obs) != list:
@@ -97,16 +98,20 @@ def _get_obstacles(obs_density, length, difficulty= 0):
             result += f"<DrawBlock x='0' y='50' z='{row}' type='{obs_types[roll]}'/> \n"
             result += f"<DrawBlock x='1' y='50' z='{row}' type='{obs_types[roll]}'/> \n"
             result += f"<DrawBlock x='2' y='50' z='{row}' type='{obs_types[roll]}'/> \n"
+            result += f"<DrawItem x='{diamon_placement}' y='50' z='{row+1}' type='diamond' /> \n"
+
         else:
             fence_gap = np.random.choice([0, 1, 2])
             for j in range(-1, 3):
                 result += f"<DrawBlock x='{j}' y='50' z='{choices[i][0]}' type='{obs_types[roll][0]}'/> \n"
                 result += f"<DrawBlock x='{j}' y='50' z='{choices[i][1] + fence_gap}' type='{obs_types[roll][1]}'/> \n"
+                result += f"<DrawItem x='{diamon_placement}' y='50' z='{choices[i][1] + fence_gap + 1}' type='diamond' /> \n"
     return result
 
 def Map():
     """Returns the XML for the project"""
-    map_length = 21
+    map_length = 22
+    assert (map_length -2) % 5 == 0
     obs_density = 0.3
     TNT_and_TRIGGERS = _get_tnt_and_triggers(length=map_length)
     obs = _get_obstacles(obs_density, map_length)
@@ -122,13 +127,6 @@ def Map():
         sandstone_setup += f"<DrawBlock x='{xloc}' y='50' z='{zloc}' type='sandstone' /> \n"
         sandstone_setup += f"<DrawBlock x='{xloc+ 1}' y='50' z='{zloc}' type='sandstone' /> \n"
 
-    diamond_setup = ""
-    diamond_loc = []
-    zloc_list = [i for i in range(3, map_length, 3)]
-    for zloc in zloc_list:
-        loc = [0, zloc]
-        diamond_loc.append(loc)
-        diamond_setup += f"<DrawItem x='0' y='50' z='{zloc}' type='diamond' /> \n"
 
     missionXML = f'''<?xml version="1.0" encoding="UTF-8" standalone="no" ?>
                     <Mission xmlns="http://ProjectMalmo.microsoft.com" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
@@ -156,7 +154,6 @@ def Map():
                                     <DrawCuboid x1='-1' x2='2' y1='47' y2='47' z1='0' z2='{map_length}' type='stone'/>''' + \
                                     TNT_and_TRIGGERS + \
                                     obs + \
-                                    diamond_setup + \
                                 '''</DrawingDecorator>
                                 <ServerQuitWhenAnyAgentFinishes/>
                                 <ServerQuitFromTimeUp timeLimitMs="100000"/>
