@@ -243,6 +243,7 @@ class MinecraftRunner(gym.Env):
 
 
 if __name__ == '__main__':
+
     ray.init()
     trainer = ppo.PPOTrainer(env=MinecraftRunner, config={
         'env_config': {},  # No environment parameters to configure
@@ -251,5 +252,25 @@ if __name__ == '__main__':
         'num_workers': 0  # We aren't using parallelism
     })
 
+    answer = input("Use last training result[Y/N]?")
+    if answer.lower() == "y":
+        while True:
+            dir_path = input("Training data path:")
+            if os.path.exists(dir_path):
+                trainer.load_checkpoint(dir_path)
+                break
+            else:
+                print(f"Inavlid path:{dir_path}")
+
+    import pathlib
+    current_directory = pathlib.Path(__file__).parent.absolute()
+
+    i = 0
     while True:
-        print(trainer.train())
+        result = trainer.train()
+        print(result)
+        i += 1
+        if i % 1 == 0:
+            checkpoint = trainer.save_checkpoint(current_directory)
+            print("checkpoint saved at", checkpoint)
+
