@@ -12,18 +12,15 @@ import os
 import sys
 import time
 import json
-import random
+import math
+import pathlib
 import gym, ray
 from MapGenerator import OBS_SIZE, MAX_EPISODE_STEPS, Map
 from gym.spaces import Discrete, Box
 from ray.rllib.agents import ppo
 
-class Agent:
-    def __init__(self):
-        self.x = 0.5
-        self.z = 0.5
-
-
+DIAMOND_POS = []
+DESTINATION_Z = 10000
 
 class MinecraftRunner(gym.Env):
 
@@ -58,6 +55,7 @@ class MinecraftRunner(gym.Env):
         self.episode_return = 0
         self.returns = []
         self.steps = []
+        self.shortest_to_dest = DESTINATION_Z
 
     def reset(self):
         """
@@ -83,6 +81,8 @@ class MinecraftRunner(gym.Env):
 
         # Get Observation
         self.obs, self.open_gate = self.get_observation(world_state)
+
+        self.shortest_to_dest = DESTINATION_Z
 
         return self.obs
 
@@ -119,6 +119,34 @@ class MinecraftRunner(gym.Env):
 
         return world_state
 
+    def obs_diamond(self, agent_x, agent_z):
+        # Get observation matrix and agent row/col
+        sight = int((OBS_SIZE - 1) / 2)
+        diamond_obs = np.zeros((OBS_SIZE,OBS_SIZE))
+        agent_row = int(OBS_SIZE/2)
+        agent_col = int(OBS_SIZE/2)
+
+        # Mark diamond position 1
+        for diamond_x, diamond_z in DIAMOND_POS:
+            x_diff = diamond_x - int(agent_x)
+            z_diff = diamond_z - int(agent_z)
+            check_x = -sight <= x_diff <= sight
+            check_z = -sight <= z_diff <= sight
+            if check_x and check_z:
+                diamond_row = z_diff + agent_row
+                diamond_col = x_diff + agent_col
+                diamond_obs[diamond_row, diamond_col] = 1
+
+        return diamond_obs
+
+    def update_diamond_list(self, agent_x, agent_z):
+        flag = False
+        for diamond_x, diamond_z in DIAMOND_POS:
+            if diamond_x == agent_x and diamond_z == agent_z:
+                DIAMOND_POS.remove((diamond_x, diamond_z))
+                flag = True
+        return flag
+
     def step(self, action):
         """
         Take an action in the environment and return the results.
@@ -142,6 +170,7 @@ class MinecraftRunner(gym.Env):
             self.episode_step += 1
 
         # Get Observation
+        old_shortest = self.shortest_to_dest # Used for giving reward of moving to the destination
         world_state = self.agent_host.getWorldState()
         for error in world_state.errors:
             print("Error:", error.text)
@@ -157,6 +186,13 @@ class MinecraftRunner(gym.Env):
             # print("value: ", r.getValue())
             # input("Enter: ")
             reward += r.getValue()
+
+        # Reward of moving towards to the destination
+        if old_shortest > self.shortest_to_dest:
+            reward += 1
+        elif old_shortest < self.shortest_to_dest:
+            reward -= 1
+
         self.episode_return += reward
 
         return self.obs, reward, done, dict()
@@ -193,14 +229,31 @@ class MinecraftRunner(gym.Env):
                     observations = json.loads(msg)
 
                 # Get observation
+                # Get block type
                 grid = observations['floorAll']
                 # print("grid: ", grid)
                 # input("Enter: ")
+
+                # Get agent position
+                agent_x = observations['XPos']
+                agent_z = observations['ZPos']
+
+                # Update shortest distance to destination if current distance is shorter
+                if DESTINATION_Z-agent_z < self.shortest_to_dest:
+                    self.shortest_to_dest = DESTINATION_Z-agent_z
+
                 for i, x in enumerate(grid):
                     obs[i] = x == 'jungle_fence_gate'
 
-                # Rotate observation with orientation of agent
+                # Get diamond observation and update diamond position
                 obs = obs.reshape((2, self.obs_size, self.obs_size))
+                obs[0] = self.obs_diamond(agent_x, agent_z)  # Get diamond observation
+                obs = obs.reshape((2, self.obs_size, self.obs_size))
+
+                # Remove collected diamond's position from the list to avoid repeat reward
+                self.update_diamond_list(agent_x, agent_z)
+
+                # Rotate observation with orientation of agent
                 yaw = observations['Yaw']
 
                 if yaw >= 225 and yaw < 315:
@@ -218,7 +271,9 @@ class MinecraftRunner(gym.Env):
         return obs, open_gate
 
     def GetXML(self):
-        return Map()
+        global DIAMOND_POS
+        XMLmap, DIAMOND_POS = Map()
+        return XMLmap
 
     def log_returns(self):
         """
@@ -260,9 +315,8 @@ if __name__ == '__main__':
                 trainer.load_checkpoint(dir_path)
                 break
             else:
-                print(f"Inavlid path:{dir_path}")
+                print(f"Invalid path:{dir_path}")
 
-    import pathlib
     current_directory = pathlib.Path(__file__).parent.absolute()
 
     i = 0
@@ -273,4 +327,3 @@ if __name__ == '__main__':
         if i % 1 == 0:
             checkpoint = trainer.save_checkpoint(current_directory)
             print("checkpoint saved at", checkpoint)
-

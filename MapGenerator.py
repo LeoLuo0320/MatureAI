@@ -2,9 +2,10 @@ from numpy.random import randint
 import numpy as np
 import random
 
-
-OBS_SIZE = 11
+OBS_SIZE = 15
 MAX_EPISODE_STEPS = 200
+# DIAMOND_POS = []
+
 
 def _get_tnt_and_triggers(length=110, prepartion_time=50, interval_time=15, step=7):
     """
@@ -74,13 +75,14 @@ def _get_tnt_and_triggers(length=110, prepartion_time=50, interval_time=15, step
     return TNT_and_TRIGGERS
 
 
-def _get_obstacles(obs_density, length, difficulty= 0):
+def _get_obstacles(obs_density, length, difficulty=0):
     '''
     :param obs_density: density of obstacle given the length of the map
     :param length: used by obs_density
     :param difficulty: 0 means easy, nonezeros will have stone_slab and fence
     '''
     assert 0 < obs_density <= 0.3
+    DIAMOND_POS = []
     obs_types = {1: "jungle_fence_gate"} if difficulty == 0 else {1: "jungle_fence_gate", 2: ["stone_slab", "fence"]}
 
     result = ""
@@ -89,7 +91,7 @@ def _get_obstacles(obs_density, length, difficulty= 0):
     choices = np.random.permutation(choices)[:obs_num]
 
     for i in range(choices.shape[0]):
-        diamon_placement = np.random.choice([-1, 0 , 1, 2])
+        diamon_placement = np.random.choice([-1, 0, 1, 2])
         roll = np.random.choice(list(obs_types.keys()))
         obs = obs_types[roll]
         if type(obs) != list:
@@ -98,7 +100,8 @@ def _get_obstacles(obs_density, length, difficulty= 0):
             result += f"<DrawBlock x='0' y='50' z='{row}' type='{obs_types[roll]}'/> \n"
             result += f"<DrawBlock x='1' y='50' z='{row}' type='{obs_types[roll]}'/> \n"
             result += f"<DrawBlock x='2' y='50' z='{row}' type='{obs_types[roll]}'/> \n"
-            result += f"<DrawItem x='{diamon_placement}' y='50' z='{row+1}' type='diamond' /> \n"
+            result += f"<DrawItem x='{diamon_placement}' y='50' z='{row + 1}' type='diamond' /> \n"
+            DIAMOND_POS.append((diamon_placement, row+1))
 
         else:
             fence_gap = np.random.choice([0, 1, 2])
@@ -106,34 +109,36 @@ def _get_obstacles(obs_density, length, difficulty= 0):
                 result += f"<DrawBlock x='{j}' y='50' z='{choices[i][0]}' type='{obs_types[roll][0]}'/> \n"
                 result += f"<DrawBlock x='{j}' y='50' z='{choices[i][1] + fence_gap}' type='{obs_types[roll][1]}'/> \n"
                 result += f"<DrawItem x='{diamon_placement}' y='50' z='{choices[i][1] + fence_gap + 1}' type='diamond' /> \n"
-    return result
+                DIAMOND_POS.append((diamon_placement, choices[i][1] + fence_gap + 1))
+    return result, DIAMOND_POS
+
 
 def Map():
     """Returns the XML for the project"""
-    map_length = 22
-    assert (map_length -2) % 5 == 0
+    map_length = 52
+    assert (map_length - 2) % 5 == 0
     obs_density = 0.3
     TNT_and_TRIGGERS = _get_tnt_and_triggers(length=map_length)
-    obs = _get_obstacles(obs_density, map_length)
+    obs, DIAMOND_POS = _get_obstacles(obs_density, map_length)
 
-    sandstone_setup = ""
-    sandstone_loc = []
-
-    zloc_list = [i for i in range(2, map_length, 3)]
-    for zloc in zloc_list:
-        xloc = random.randint(-1, 1)
-        loc = [xloc, zloc]
-        sandstone_loc.append(loc)
-        sandstone_setup += f"<DrawBlock x='{xloc}' y='50' z='{zloc}' type='sandstone' /> \n"
-        sandstone_setup += f"<DrawBlock x='{xloc+ 1}' y='50' z='{zloc}' type='sandstone' /> \n"
-
+    # Sandstone obstacles
+    # sandstone_setup = ""
+    # sandstone_loc = []
+    #
+    # zloc_list = [i for i in range(2, map_length, 3)]
+    # for zloc in zloc_list:
+    #     xloc = random.randint(-1, 1)
+    #     loc = [xloc, zloc]
+    #     sandstone_loc.append(loc)
+    #     sandstone_setup += f"<DrawBlock x='{xloc}' y='50' z='{zloc}' type='sandstone' /> \n"
+    #     sandstone_setup += f"<DrawBlock x='{xloc + 1}' y='50' z='{zloc}' type='sandstone' /> \n"
 
     missionXML = f'''<?xml version="1.0" encoding="UTF-8" standalone="no" ?>
                     <Mission xmlns="http://ProjectMalmo.microsoft.com" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
                         <About>
                             <Summary>Runner</Summary>
                         </About>
-                        
+
                         <ServerSection>
                             <ServerInitialConditions>
                                 <Time>
@@ -152,40 +157,41 @@ def Map():
                                     <DrawCuboid x1='3' x2='3' y1='49' y2='50' z1='0' z2='{map_length}' type='stone'/>
                                     <DrawCuboid x1='-1' x2='2' y1='49' y2='50' z1='-1' z2='-1' type='stone'/>
                                     <DrawCuboid x1='-1' x2='2' y1='47' y2='47' z1='0' z2='{map_length}' type='stone'/>''' + \
-                                    TNT_and_TRIGGERS + \
-                                    obs + \
-                                '''</DrawingDecorator>
-                                <ServerQuitWhenAnyAgentFinishes/>
-                                <ServerQuitFromTimeUp timeLimitMs="100000"/>
-                                <ServerQuitWhenAnyAgentFinishes/>
-                            </ServerHandlers>
-                        </ServerSection>
-                    
-                        <AgentSection mode="Survival">
-                            <Name>CS175 mature AI demo</Name>
-                            <AgentStart>
-                                <Placement x="0.5" y="50" z="0.5" pitch="45" yaw="0"/>
-                                <Inventory>
-                                    <InventoryItem slot="0" type="diamond_pickaxe"/>
-                                    <InventoryItem slot="1" type="diamond_shovel"/>
-                                </Inventory>
-                            </AgentStart>
-                            <AgentHandlers>
-                                <DiscreteMovementCommands/>
-                                <RewardForTouchingBlockType>
-                                    <Block type='emerald_block' reward='10'/>
-                                    <Block type="stone" reward='-1'/>
-                                </RewardForTouchingBlockType>
-                                <RewardForCollectingItem>
-                                    <Item type='diamond' reward='1'/>
-                                </RewardForCollectingItem>
-                                <RewardForTimeTaken initialReward='0' delta='0.05' density='MISSION_END' />
-                                <ObservationFromFullStats/>
-                                <ObservationFromRay/>
-                                <ObservationFromGrid>
-                                    <Grid name="floorAll">
-                                        <min x="-''' + str(int(OBS_SIZE/2)) + '''" y="-1" z="-''' + str(int(OBS_SIZE/2)) + '''"/>
-                                        <max x="''' + str(int(OBS_SIZE/2)) + '''" y="0" z="''' + str(int(OBS_SIZE/2)) + '''"/>
+                 TNT_and_TRIGGERS + \
+                 obs + \
+                 '''</DrawingDecorator>
+                 <ServerQuitWhenAnyAgentFinishes/>
+                 <ServerQuitFromTimeUp timeLimitMs="100000"/>
+                 <ServerQuitWhenAnyAgentFinishes/>
+             </ServerHandlers>
+         </ServerSection>
+
+         <AgentSection mode="Survival">
+             <Name>CS175 mature AI demo</Name>
+             <AgentStart>
+                 <Placement x="0.5" y="50" z="0.5" pitch="45" yaw="0"/>
+                 <Inventory>
+                     <InventoryItem slot="0" type="diamond_pickaxe"/>
+                     <InventoryItem slot="1" type="diamond_shovel"/>
+                 </Inventory>
+             </AgentStart>
+             <AgentHandlers>
+                 <DiscreteMovementCommands/>
+                 <RewardForTouchingBlockType>
+                     <Block type='emerald_block' reward='10'/>
+                     <Block type="stone" reward='-1'/>
+                 </RewardForTouchingBlockType>
+                 <RewardForCollectingItem>
+                     <Item type='diamond' reward='1'/>
+                 </RewardForCollectingItem>
+                 <RewardForTimeTaken initialReward='0' delta='0.05' density='MISSION_END' />
+                 <ObservationFromFullStats/>
+                 <ObservationFromRay/>
+                 <ObservationFromGrid>
+                     <Grid name="floorAll">
+                         <min x="-''' + str(int(OBS_SIZE / 2)) + '''" y="-1" z="-''' + str(int(OBS_SIZE / 2)) + '''"/>
+                                        <max x="''' + str(int(OBS_SIZE / 2)) + '''" y="0" z="''' + str(
+        int(OBS_SIZE / 2)) + '''"/>
                                     </Grid>
                                 </ObservationFromGrid>
                                 <AgentQuitFromReachingCommandQuota total="''' + str(MAX_EPISODE_STEPS) + '''" />
@@ -196,4 +202,4 @@ def Map():
                         </AgentSection>
                     </Mission>'''
 
-    return missionXML
+    return missionXML, DIAMOND_POS
