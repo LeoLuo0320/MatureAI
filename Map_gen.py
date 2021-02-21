@@ -15,7 +15,7 @@ else:
 video_width = 800
 video_height = 600
 
-def _get_tnt_and_triggers(length = 110,prepartion_time = 50,interval_time = 15,step = 7):
+def _get_tnt_and_triggers(length = 110,prepartion_time = 50,interval_time = 15,step = 6):
     """
         Generating XML for TNT and redstone triggers
         :Parameterms
@@ -38,7 +38,7 @@ def _get_tnt_and_triggers(length = 110,prepartion_time = 50,interval_time = 15,s
         TNT_and_TRIGGERS += f"<DrawBlock x='{3}' y='47' z='{i}' type ='stone'/> \n"
         TNT_and_TRIGGERS += f"<DrawBlock x='{3}' y='48' z='{i}' face='NORTH' type ='unpowered_repeater'/> \n"
     else:
-        TNT_and_TRIGGERS += f"<DrawBlock x='{3}' y='48' z='{(-prepartion_time)}'  type ='redstone_torch'/> \n"
+       # TNT_and_TRIGGERS += f"<DrawBlock x='{3}' y='48' z='{(-prepartion_time)}'  type ='redstone_torch'/> \n"
         TNT_and_TRIGGERS += f"<DrawBlock x='{3}' y='48' z='{(-prepartion_time-1)}'  type ='tnt'/> \n"
 
     for i in range(0,length):
@@ -58,10 +58,10 @@ def _get_tnt_and_triggers(length = 110,prepartion_time = 50,interval_time = 15,s
         odd = True
 
     for i in range(0, length, step):
-        # TNT_and_TRIGGERS += f"<DrawBlock x='-1' y='48' z='{i}' type='tnt'/> \n"
-        # TNT_and_TRIGGERS += f"<DrawBlock x='-0' y='48' z='{i}' type='tnt'/> \n"
-        # TNT_and_TRIGGERS += f"<DrawBlock x='1' y='48' z='{i}' type='tnt'/> \n"
-        # TNT_and_TRIGGERS += f"<DrawBlock x='2' y='48' z='{i}' type='tnt'/> \n"
+        TNT_and_TRIGGERS += f"<DrawBlock x='-1' y='48' z='{i}' type='tnt'/> \n"
+        TNT_and_TRIGGERS += f"<DrawBlock x='-0' y='48' z='{i}' type='tnt'/> \n"
+        TNT_and_TRIGGERS += f"<DrawBlock x='1' y='48' z='{i}' type='tnt'/> \n"
+        TNT_and_TRIGGERS += f"<DrawBlock x='2' y='48' z='{i}' type='tnt'/> \n"
         for j in range(num_of_repeater):
             TNT_and_TRIGGERS += f"<DrawBlock x='{3+j}' y='47' z='{i}' type='stone'/> \n"
             if odd:
@@ -92,27 +92,33 @@ def _get_obstacles(obs_density, length, difficulty= 1):
     :param difficulty: 0 means easy, nonezeros will have stone_slab and fence
     '''
     assert 0 < obs_density <= 0.3
-    obs_types = {1: "jungle_fence_gate"} if difficulty == 0 else {1: "jungle_fence_gate", 2: ["stone_slab", "fence"]}
-
     result = ""
+    if difficulty > 1:
+        for i in range(1, length, 40):# for every 30 blocks we will spawn a ghast
+            result += f"<DrawEntity x='-15' y='65' z='{i}' type='Ghast'/>"
+    obs_types = {1: "jungle_fence_gate"} if difficulty == 0 else {1: "jungle_fence_gate", 2: ["stone_slab", "acacia_fence"]}
+
     obs_num = int(length * obs_density)
     choices = np.arange(2, length, dtype=np.int32).reshape(-1, 5)
     choices = np.random.permutation(choices)[:obs_num]
+    print(choices.shape)
 
     for i in range(choices.shape[0]):
         diamon_placement = np.random.choice([-1, 0 , 1, 2])
         roll = np.random.choice(list(obs_types.keys()))
+        enable_col = np.random.choice([-1,0,1,2], 2, replace=False)
         obs = obs_types[roll]
         if type(obs) != list:
-            row = np.random.choice(choices[i])  # we will spawn gate from range(0 - 4)
-            result += f"<DrawBlock x='-1' y='50' z='{row}' type='{obs_types[roll]}'/> \n"
-            result += f"<DrawBlock x='0' y='50' z='{row}' type='{obs_types[roll]}'/> \n"
-            result += f"<DrawBlock x='1' y='50' z='{row}' type='{obs_types[roll]}'/> \n"
-            result += f"<DrawBlock x='2' y='50' z='{row}' type='{obs_types[roll]}'/> \n"
+            row = np.random.choice(choices[i][1:])  # we will spawn gate from range(1 - 4)
+            for j in enable_col:
+                result += f"<DrawBlock x='{j}' y='50' z='{row}' type='{obs_types[roll]}'/> \n"
+            for j in np.setdiff1d([-1,0,1,2], enable_col): # disabled gate we will use fence instead
+                result += f"<DrawBlock x='{j}' y='50' z='{row}' type='acacia_fence'/> \n"
             result += f"<DrawItem x='{diamon_placement}' y='50' z='{row+1}' type='diamond' /> \n"
 
         else:
-            fence_gap = np.random.choice([0, 1, 2])
+            # fence_gap = np.random.choice([0, 1, 2])
+            fence_gap = np.random.choice([0,1])
             for j in range(-1, 3):
                 result += f"<DrawBlock x='{j}' y='50' z='{choices[i][0]}' type='{obs_types[roll][0]}'/> \n"
                 result += f"<DrawBlock x='{j}' y='50' z='{choices[i][1] + fence_gap}' type='{obs_types[roll][1]}'/> \n"
@@ -121,7 +127,7 @@ def _get_obstacles(obs_density, length, difficulty= 1):
 
 def GetXML(obs_size =5):
     """Returns the XML for the project"""
-    map_length = 51
+    map_length = 62
     assert (map_length -2) % 5 == 0
 
     obs_density = 0.3
@@ -138,7 +144,7 @@ def GetXML(obs_size =5):
                         <ServerSection>
                             <ServerInitialConditions>
                                 <Time>
-                                    <StartTime>0</StartTime>
+                                    <StartTime>12000</StartTime>
                                     <AllowPassageOfTime>false</AllowPassageOfTime>
                                 </Time>
                                 <Weather>clear</Weather>
@@ -146,13 +152,19 @@ def GetXML(obs_size =5):
                             <ServerHandlers>
                                 <FlatWorldGenerator forceReset="true" generatorString="3;7,2;1;"/>
                                 <DrawingDecorator>
-                                    <DrawCuboid x1='-50' x2='50' y1='50' y2='50' z1='0' z2='{map_length}' type='air'/>
-                                    <DrawCuboid x1='-1' x2='2' y1='48' y2='48' z1='0' z2='{map_length}' type='air'/>
-                                    <DrawCuboid x1='-1' x2='2' y1='49' y2='49' z1='0' z2='{map_length}' type='diamond_block'/>
-                                    <DrawCuboid x1='-2' x2='-2' y1='49' y2='50' z1='0' z2='{map_length}' type='stone'/>
-                                    <DrawCuboid x1='3' x2='3' y1='49' y2='50' z1='0' z2='{map_length}' type='stone'/>
-                                    <DrawCuboid x1='-1' x2='2' y1='49' y2='50' z1='-1' z2='-1' type='stone'/>
-                                    <DrawCuboid x1='-1' x2='2' y1='47' y2='47' z1='0' z2='{map_length}' type='stone'/>'''  +\
+                                    <DrawCuboid x1='-30' x2='8' y1='80' y2='80' z1='-6' z2='{map_length}' type='glass'/>
+                                    <DrawCuboid x1='-30' x2='-30' y1='80' y2='0' z1='-6' z2='{map_length}' type='glass'/>
+                                    <DrawCuboid x1='-30' x2='8' y1='80' y2='0' z1='-6' z2='-6' type='glass'/>
+                                    <DrawCuboid x1='-30' x2='8' y1='43' y2='43' z1='-6' z2='{map_length}' type='glass'/>
+                                    <DrawCuboid x1='8' x2='8' y1='80' y2='48' z1='-6' z2='{map_length}' type='diamond_block'/>
+                                    <DrawCuboid x1='-30' x2='8' y1='80' y2='48' z1='{map_length+3}' z2='{map_length+3}' type='glass'/>
+                                    
+                                    <DrawCuboid x1='-1' x2='2' y1='47' y2='47' z1='0' z2='{map_length}' type='stone'/>
+                                    <DrawCuboid x1='-2' x2='3' y1='49' y2='49' z1='-1' z2='{map_length}' type='diamond_block'/> 
+                                    <DrawCuboid x1='3' x2='3' y1='50' y2='50' z1='-1' z2='{map_length}' type='dark_oak_fence'/>
+                                    <DrawCuboid x1='-2' x2='-2' y1='50' y2='50' z1='-1' z2='{map_length}' type='dark_oak_fence'/>
+                                    <DrawCuboid x1='-1' x2='2' y1='50' y2='50' z1='-1' z2='-1' type='dark_oak_fence'/>
+                                    '''  +\
                                     TNT_and_TRIGGERS + \
                                     obs +\
                                 '''</DrawingDecorator>
@@ -172,7 +184,7 @@ def GetXML(obs_size =5):
                             </Inventory>
                             </AgentStart>
                              <AgentHandlers>
-                                    <DiscreteMovementCommands/>
+                                    <ContinuousMovementCommands/>
                                     <RewardForTouchingBlockType>
                                         <Block type='emerald_block' reward='10'/>
                                         <Block type="stone" reward='-1'/>
@@ -198,6 +210,7 @@ def GetXML(obs_size =5):
 
 
 if __name__ == "__main__":
+
     agent_host = MalmoPython.AgentHost()
     try:
         agent_host.parse(sys.argv)
@@ -235,7 +248,14 @@ if __name__ == "__main__":
         for error in world_state.errors:
             print("Error:", error.text)
 
-    print("\nMission running ", end=' ')
+    print()
+    print("Mission running ", end=' ')
+
+    # ADD YOUR CODE HERE
+    agent_host.sendCommand("jump 1")
+    agent_host.sendCommand("move 1")
+
+    # TO GET YOUR AGENT TO THE DIAMOND BLOCK
 
     # Loop until mission ends:
     while world_state.is_mission_running:
@@ -245,4 +265,5 @@ if __name__ == "__main__":
         for error in world_state.errors:
             print("Error:", error.text)
 
-    print("\nMission ended")
+    print()
+    print("Mission ended")

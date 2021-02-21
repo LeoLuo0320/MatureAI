@@ -33,7 +33,11 @@ class MinecraftRunner(gym.Env):
             0: 'move 1',  # Move one block forward
             1: 'turn 1',  # Turn 90 degrees to the right  # Turn 90 degrees to the left
             2: 'turn -1',
-            3: 'use 1'
+            3: 'turn 0',
+            4: 'use 1',
+            5: 'use 0',
+            6: 'jump 1',
+            7: 'jump 0',
         }
 
         # Rllib Parameters
