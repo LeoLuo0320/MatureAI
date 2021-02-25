@@ -19,26 +19,27 @@ from MapGenerator import OBS_SIZE, MAX_EPISODE_STEPS, Map
 from gym.spaces import Discrete, Box
 from ray.rllib.agents import ppo
 
-# new code
-import torch
-from torch import nn
-import torch.nn.functional as F
-from ray.rllib.models import ModelCatalog
-from ray.rllib.models.torch.torch_modelv2 import TorchModelV2
+# Neural Network related
+# import torch
+# from torch import nn
+# import torch.nn.functional as F
+# from ray.rllib.models import ModelCatalog
+# from ray.rllib.models.torch.torch_modelv2 import TorchModelV2
 
 DIAMOND_POS = []
 DESTINATION_Z = 10000
 
-# new code
+
+# Neural Network Model
 # class MyModel(TorchModelV2, nn.Module):
 #     def __init__(self, *args, **kwargs):
 #         TorchModelV2.__init__(self, *args, **kwargs)
 #         nn.Module.__init__(self)
 
 #         # channle number is 2, 32 hiden channels
-#         self.conv1 = nn.Conv2d(4, 32, kernel_size=7, padding=3) # 32, 5, 5 
-#         self.conv2 = nn.Conv2d(32, 32, kernel_size=7, padding=3) # 32, 5, 5 
-#         self.conv3 = nn.Conv2d(32, 32, kernel_size=7, padding=3) # 32, 5, 5 
+#         self.conv1 = nn.Conv2d(4, 32, kernel_size=7, padding=3) # 32, 5, 5
+#         self.conv2 = nn.Conv2d(32, 32, kernel_size=7, padding=3) # 32, 5, 5
+#         self.conv3 = nn.Conv2d(32, 32, kernel_size=7, padding=3) # 32, 5, 5
 #         # 4 is the discrete action number
 #         self.policy_layer = nn.Linear(32*15*15, 5)
 #         self.value_layer = nn.Linear(32*15*15, 1)
@@ -58,7 +59,7 @@ DESTINATION_Z = 10000
 #         self.value = self.value_layer(x) # BATCH, 1
 
 #         return policy, state
-    
+
 #     def value_function(self):
 #         return self.value.squeeze(1)
 
@@ -73,14 +74,14 @@ class MinecraftRunner(gym.Env):
         self.action_dict = {
             0: 'move 1',  # Move one block forward
             1: 'turn 1',  # Turn 90 degrees to the right
-            2: 'turn -1', # Turn 90 degrees to the left
-            3: 'use 1',   # For opening gates
-            4: 'jumpmove 1' # For jump over gates
+            2: 'turn -1',  # Turn 90 degrees to the left
+            3: 'use 1',  # For opening gates
+            4: 'jump 1'  # For jump over gates
         }
 
         # Rllib Parameters
         self.action_space = Discrete(len(self.action_dict))
-        self.observation_space = Box(0, 1, shape=(4, self.obs_size, self.obs_size), dtype=np.float32)
+        self.observation_space = Box(0, 1, shape=(4*self.obs_size*self.obs_size,), dtype=np.float32)
 
         # Malmo Parameters
         self.agent_host = MalmoPython.AgentHost()
@@ -120,7 +121,7 @@ class MinecraftRunner(gym.Env):
 
         # Log
         if len(self.returns) > self.log_frequency + 1 and \
-            len(self.returns) % self.log_frequency == 0:
+                len(self.returns) % self.log_frequency == 0:
             self.log_returns()
 
         # Get Observation
@@ -170,9 +171,9 @@ class MinecraftRunner(gym.Env):
     def obs_diamond(self, agent_x, agent_z):
         # Get observation matrix and agent row/col
         sight = int((OBS_SIZE - 1) / 2)
-        diamond_obs = np.zeros((OBS_SIZE,OBS_SIZE))
-        agent_row = int(OBS_SIZE/2)
-        agent_col = int(OBS_SIZE/2)
+        diamond_obs = np.zeros((OBS_SIZE, OBS_SIZE))
+        agent_row = int(OBS_SIZE / 2)
+        agent_col = int(OBS_SIZE / 2)
 
         # Mark diamond position 1
         for diamond_x, diamond_z in DIAMOND_POS:
@@ -223,9 +224,8 @@ class MinecraftRunner(gym.Env):
             time.sleep(.1)
         self.episode_step += 1
 
-
         # Get Observation
-        old_dest = self.current_to_dest # Used for giving reward of moving to the destination
+        old_dest = self.current_to_dest  # Used for giving reward of moving to the destination
         old_shortest = self.shortest_to_dest
         world_state = self.agent_host.getWorldState()
         for error in world_state.errors:
@@ -305,19 +305,19 @@ class MinecraftRunner(gym.Env):
 
                 # Update shortest distance to destination if current distance is shorter
                 self.current_to_dest = DESTINATION_Z - agent_z
-                if DESTINATION_Z-agent_z < self.shortest_to_dest:
-                    self.shortest_to_dest = DESTINATION_Z-agent_z
+                if DESTINATION_Z - agent_z < self.shortest_to_dest:
+                    self.shortest_to_dest = DESTINATION_Z - agent_z
 
                 obs_list = ['jungle_fence_gate', 'dark_oak_fence', 'acacia_fence']
                 obs = list(self.obs_diamond(agent_x, agent_z).flatten())
                 for i in range(len(obs_list)):
                     for x in grid:
-                        if x == obs_list[i]: 
+                        if x == obs_list[i]:
                             obs.append(1.0)
                         else:
                             obs.append(0.0)
                 obs = np.array(obs)
-                obs = obs.reshape((len(obs_list)+1, self.obs_size, self.obs_size))
+                obs = obs.reshape((len(obs_list) + 1, self.obs_size, self.obs_size))
                 # print(len(obs))
                 # print(len(obs[0]))
                 # print(len(obs[0][0]))
@@ -336,7 +336,7 @@ class MinecraftRunner(gym.Env):
                 elif yaw >= 45 and yaw < 135:
                     obs = np.rot90(obs, k=3, axes=(1, 2))
 
-                # obs = obs.flatten()
+                obs = obs.flatten()
                 if 'LineOfSight' in observations.keys():
                     open_gate = observations['LineOfSight']['type'] == "jungle_fence_gate"
                     jump_gate = observations['LineOfSight']['type'] == "acacia_fence"
