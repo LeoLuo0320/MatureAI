@@ -85,9 +85,10 @@ def _get_obstacles(obs_density, length, difficulty=0):
     DIAMOND_POS = []
     result = ""
     if difficulty > 1:
-        for i in range(1, length, 40):# for every 30 blocks we will spawn a ghast
+        for i in range(1, length, 40):  # for every 30 blocks we will spawn a ghast
             result += f"<DrawEntity x='-15' y='65' z='{i}' type='Ghast'/>"
-    obs_types = {1: "jungle_fence_gate"} if difficulty == 0 else {1: "jungle_fence_gate", 2: ["stone_slab", "acacia_fence"]}
+    obs_types = {1: "jungle_fence_gate"} if difficulty == 0 else {1: "jungle_fence_gate",
+                                                                  2: ["stone_slab", "acacia_fence"]}
     obs_num = int(length * obs_density)
     choices = np.arange(2, length, dtype=np.int32).reshape(-1, 5)
     choices = np.random.permutation(choices)[:obs_num]
@@ -95,18 +96,18 @@ def _get_obstacles(obs_density, length, difficulty=0):
     for i in range(choices.shape[0]):
         diamon_placement = np.random.choice([-1, 0, 1, 2])
         roll = np.random.choice(list(obs_types.keys()))
-        enable_col = np.random.choice([-1,0,1,2], 2, replace=False)
+        enable_col = np.random.choice([-1, 0, 1, 2], 2, replace=False)
         obs = obs_types[roll]
         if type(obs) != list:
             row = np.random.choice(choices[i][1:])  # we will spawn gate from range(1 - 4)
             for j in enable_col:
                 result += f"<DrawBlock x='{j}' y='50' z='{row}' type='{obs_types[roll]}'/> \n"
-            for j in np.setdiff1d([-1,0,1,2], enable_col): # disabled gate we will use fence instead
+            for j in np.setdiff1d([-1, 0, 1, 2], enable_col):  # disabled gate we will use fence instead
                 result += f"<DrawBlock x='{j}' y='50' z='{row}' type='acacia_fence'/> \n"
-            result += f"<DrawItem x='{diamon_placement}' y='50' z='{row+1}' type='diamond' /> \n"
-            DIAMOND_POS.append((diamon_placement, row+1))
+            result += f"<DrawItem x='{diamon_placement}' y='50' z='{row + 1}' type='diamond' /> \n"
+            DIAMOND_POS.append((diamon_placement, row + 1))
         else:
-            fence_gap = np.random.choice([0, 1])
+            fence_gap = 0
             for j in range(-1, 3):
                 result += f"<DrawBlock x='{j}' y='50' z='{choices[i][0]}' type='{obs_types[roll][0]}'/> \n"
                 result += f"<DrawBlock x='{j}' y='50' z='{choices[i][1] + fence_gap}' type='{obs_types[roll][1]}'/> \n"
@@ -121,7 +122,7 @@ def Map():
     assert (map_length - 2) % 5 == 0
     obs_density = 0.3
     TNT_and_TRIGGERS = _get_tnt_and_triggers(length=map_length)
-    obs, DIAMOND_POS = _get_obstacles(obs_density, map_length)
+    obs, DIAMOND_POS = _get_obstacles(obs_density, map_length, difficulty=1)
 
     missionXML = f'''<?xml version="1.0" encoding="UTF-8" standalone="no" ?>
                     <Mission xmlns="http://ProjectMalmo.microsoft.com" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
@@ -141,21 +142,21 @@ def Map():
                                 <DrawingDecorator>
                                     <DrawCuboid x1='-30' x2='10' y1='80' y2='80' z1='-6' z2='{map_length}' type='glass'/>
                                     <DrawCuboid x1='-30' x2='-30' y1='80' y2='0' z1='-6' z2='{map_length}' type='glass'/>
-                                    
+
                                     <DrawCuboid x1='-30' x2='10' y1='80' y2='0' z1='-6' z2='-6' type='glass'/>
-                                    <DrawCuboid x1='-30' x2='8' y1='80' y2='48' z1='{map_length+3}' z2='{map_length+3}' type='glass'/>
+                                    <DrawCuboid x1='-30' x2='8' y1='80' y2='48' z1='{map_length + 3}' z2='{map_length + 3}' type='glass'/>
 
                                     <DrawCuboid x1='-30' x2='10' y1='10' y2='10' z1='-6' z2='{map_length}' type='glass'/>
                                     <DrawCuboid x1='10' x2='10' y1='80' y2='10' z1='-6' z2='{map_length}' type='diamond_block'/>
-                                    
+
                                     <DrawCuboid x1='-1' x2='2' y1='47' y2='47' z1='0' z2='{map_length}' type='stone'/>
                                     <DrawCuboid x1='-1' x2='2' y1='49' y2='49' z1='-1' z2='{map_length}' type='diamond_block'/> 
                                     <DrawCuboid x1='3' x2='3' y1='50' y2='50' z1='-1' z2='{map_length}' type='dark_oak_fence'/>
                                     <DrawCuboid x1='-2' x2='-2' y1='50' y2='50' z1='-1' z2='{map_length}' type='dark_oak_fence'/>
                                     <DrawCuboid x1='-1' x2='2' y1='50' y2='50' z1='-1' z2='-1' type='dark_oak_fence'/>
-                                    '''+\
-                                    TNT_and_TRIGGERS + \
-                                    obs + \
+                                    ''' + \
+                 TNT_and_TRIGGERS + \
+                 obs + \
                  '''</DrawingDecorator>
                  <ServerQuitWhenAnyAgentFinishes/>
                  <ServerQuitFromTimeUp timeLimitMs="100000"/>
@@ -167,10 +168,9 @@ def Map():
                  <Placement x="0.5" y="50" z="0.5" pitch="45" yaw="0"/>
              </AgentStart>
              <AgentHandlers>
-                 <ContinuousMovementCommands/>
+                 <DiscreteMovementCommands/>
                  <RewardForTouchingBlockType>
                      <Block type='emerald_block' reward='10'/>
-                     <Block type="stone" reward='-2'/>
                      <Block type="glass" reward='-2'/>
                      <Block type="dark_oak_fence" reward='-1'/>
                  </RewardForTouchingBlockType>
@@ -182,7 +182,7 @@ def Map():
                  <ObservationFromRay/>
                  <ObservationFromGrid>
                      <Grid name="floorAll">
-                         <min x="-''' + str(int(OBS_SIZE / 2)) + '''" y="-1" z="-''' + str(int(OBS_SIZE / 2)) + '''"/>
+                         <min x="-''' + str(int(OBS_SIZE / 2)) + '''" y="0" z="-''' + str(int(OBS_SIZE / 2)) + '''"/>
                                         <max x="''' + str(int(OBS_SIZE / 2)) + '''" y="0" z="''' + str(int(OBS_SIZE / 2)) + '''"/>
                                     </Grid>
                                 </ObservationFromGrid>
