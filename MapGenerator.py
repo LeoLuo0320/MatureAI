@@ -118,7 +118,7 @@ def _get_obstacles(obs_density, length, difficulty=0):
 
 def Map():
     """Returns the XML for the project"""
-    map_length = 52
+    map_length = 22
     assert (map_length - 2) % 5 == 0
     obs_density = 0.3
     TNT_and_TRIGGERS = _get_tnt_and_triggers(length=map_length)
@@ -142,13 +142,10 @@ def Map():
                                 <DrawingDecorator>
                                     <DrawCuboid x1='-30' x2='10' y1='80' y2='80' z1='-6' z2='{map_length}' type='glass'/>
                                     <DrawCuboid x1='-30' x2='-30' y1='80' y2='0' z1='-6' z2='{map_length}' type='glass'/>
-
                                     <DrawCuboid x1='-30' x2='10' y1='80' y2='0' z1='-6' z2='-6' type='glass'/>
                                     <DrawCuboid x1='-30' x2='8' y1='80' y2='48' z1='{map_length + 3}' z2='{map_length + 3}' type='glass'/>
-
                                     <DrawCuboid x1='-30' x2='10' y1='10' y2='10' z1='-6' z2='{map_length}' type='glass'/>
                                     <DrawCuboid x1='10' x2='10' y1='80' y2='10' z1='-6' z2='{map_length}' type='diamond_block'/>
-
                                     <DrawCuboid x1='-1' x2='2' y1='47' y2='47' z1='0' z2='{map_length}' type='stone'/>
                                     <DrawCuboid x1='-1' x2='2' y1='49' y2='49' z1='-1' z2='{map_length}' type='diamond_block'/> 
                                     <DrawCuboid x1='3' x2='3' y1='50' y2='50' z1='-1' z2='{map_length}' type='dark_oak_fence'/>
@@ -168,7 +165,8 @@ def Map():
                  <Placement x="0.5" y="50" z="0.5" pitch="45" yaw="0"/>
              </AgentStart>
              <AgentHandlers>
-                 <DiscreteMovementCommands/>
+                 <ContinuousMovementCommands/>
+                 <ChatCommands/>
                  <RewardForTouchingBlockType>
                      <Block type='emerald_block' reward='10'/>
                      <Block type="glass" reward='-2'/>
