@@ -213,13 +213,13 @@ class MinecraftRunner(gym.Env):
 
         # Get Action
         command = self.action_dict[action]
-        if command not in ['use 1', 'jumpmove 1']:
+        if command not in ['use 1', 'jump 1']:
             self.agent_host.sendCommand(command)
             time.sleep(0.1)
         elif command == 'use 1' and self.open_gate:
             self.agent_host.sendCommand(command)
             time.sleep(0.1)
-        elif command == 'jumpmove 1' and self.jump_gate:
+        elif command == 'jump 1' and self.jump_gate:
             self.agent_host.sendCommand(command)
             time.sleep(.1)
         self.episode_step += 1
