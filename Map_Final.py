@@ -87,7 +87,7 @@ def _get_obstacles(obs_density, length, difficulty=0):
     if difficulty > 1:
         for i in range(1, length, 40):  # for every 30 blocks we will spawn a ghast
             result += f"<DrawEntity x='-15' y='65' z='{i}' type='Ghast'/>"
-    obs_types = {1: "jungle_fence_gate"} if difficulty == 0 else {1: "jungle_fence_gate",
+    obs_types = {1: "fence_gate"} if difficulty == 0 else {1: "fence_gate",
                                                                   2: ["stone_slab", "acacia_fence"]}
     obs_num = int(length * obs_density)
     choices = np.arange(2, length, dtype=np.int32).reshape(-1, 5)
@@ -103,7 +103,7 @@ def _get_obstacles(obs_density, length, difficulty=0):
             for j in enable_col:
                 result += f"<DrawBlock x='{j}' y='50' z='{row}' type='{obs_types[roll]}'/> \n"
             for j in np.setdiff1d([-1, 0, 1, 2], enable_col):  # disabled gate we will use fence instead
-                result += f"<DrawBlock x='{j}' y='50' z='{row}' type='acacia_fence'/> \n"
+                result += f"<DrawBlock x='{j}' y='50' z='{row}' type='fence'/> \n"
             result += f"<DrawItem x='{diamon_placement}' y='50' z='{row + 1}' type='diamond' /> \n"
             DIAMOND_POS.append((diamon_placement, row + 1))
         else:

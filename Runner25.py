@@ -308,7 +308,7 @@ class MinecraftRunner(gym.Env):
                 if DESTINATION_Z - agent_z < self.shortest_to_dest:
                     self.shortest_to_dest = DESTINATION_Z - agent_z
 
-                obs_list = ['jungle_fence_gate', 'dark_oak_fence', 'acacia_fence']
+                obs_list = ['fence_gate', 'dark_oak_fence', 'acacia_fence']
                 obs = list(self.obs_diamond(agent_x, agent_z).flatten())
                 for i in range(len(obs_list)):
                     for x in grid:
@@ -337,7 +337,7 @@ class MinecraftRunner(gym.Env):
                     obs = np.rot90(obs, k=3, axes=(1, 2))
 
                 if 'LineOfSight' in observations.keys():
-                    open_gate = observations['LineOfSight']['type'] == "jungle_fence_gate"
+                    open_gate = observations['LineOfSight']['type'] == "fence_gate"
                     jump_gate = observations['LineOfSight']['type'] == "acacia_fence"
 
             break
