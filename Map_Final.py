@@ -63,14 +63,14 @@ def _get_tnt_and_triggers(length=110, prepartion_time=50, interval_time=15, step
             TNT_and_TRIGGERS += f"<DrawBlock x='{3}' y='48' z='{i}'  type ='redstone_wire'/> \n"
         odd = (odd != True)
     else:  # adding destination block
+        TNT_and_TRIGGERS += f"<DrawBlock x='-1' y='49' z='{i + 2}' type='emerald_block'/> \n"
+        TNT_and_TRIGGERS += f"<DrawBlock x='-0' y='49' z='{i + 2}' type='emerald_block'/> \n"
+        TNT_and_TRIGGERS += f"<DrawBlock x='1' y='49' z='{i + 2}' type='emerald_block'/> \n"
+        TNT_and_TRIGGERS += f"<DrawBlock x='2' y='49' z='{i + 2}' type='emerald_block'/> \n"
         TNT_and_TRIGGERS += f"<DrawBlock x='-1' y='49' z='{i + 3}' type='emerald_block'/> \n"
         TNT_and_TRIGGERS += f"<DrawBlock x='-0' y='49' z='{i + 3}' type='emerald_block'/> \n"
         TNT_and_TRIGGERS += f"<DrawBlock x='1' y='49' z='{i + 3}' type='emerald_block'/> \n"
         TNT_and_TRIGGERS += f"<DrawBlock x='2' y='49' z='{i + 3}' type='emerald_block'/> \n"
-        TNT_and_TRIGGERS += f"<DrawBlock x='-1' y='49' z='{i + 4}' type='emerald_block'/> \n"
-        TNT_and_TRIGGERS += f"<DrawBlock x='-0' y='49' z='{i + 4}' type='emerald_block'/> \n"
-        TNT_and_TRIGGERS += f"<DrawBlock x='1' y='49' z='{i + 4}' type='emerald_block'/> \n"
-        TNT_and_TRIGGERS += f"<DrawBlock x='2' y='49' z='{i + 4}' type='emerald_block'/> \n"
     return TNT_and_TRIGGERS
 
 
@@ -85,7 +85,7 @@ def _get_obstacles(obs_density, length, difficulty=0):
     DIAMOND_POS = []
     result = ""
     if difficulty > 1:
-        for i in range(1, length, 40):  # for every 30 blocks we will spawn a ghast
+        for i in range(2, length, 40):  # for every 30 blocks we will spawn a ghast
             result += f"<DrawEntity x='-15' y='65' z='{i}' type='Ghast'/>"
     obs_types = {1: "fence_gate"} if difficulty == 0 else {1: "fence_gate",
                                                                   2: ["stone_slab", "acacia_fence"]}
@@ -111,8 +111,8 @@ def _get_obstacles(obs_density, length, difficulty=0):
             for j in range(-1, 3):
                 result += f"<DrawBlock x='{j}' y='50' z='{choices[i][0]}' type='{obs_types[roll][0]}'/> \n"
                 result += f"<DrawBlock x='{j}' y='50' z='{choices[i][1] + fence_gap}' type='{obs_types[roll][1]}'/> \n"
-                result += f"<DrawItem x='{diamon_placement}' y='50' z='{choices[i][1] + fence_gap + 1}' type='diamond' /> \n"
-                DIAMOND_POS.append((diamon_placement, choices[i][1] + fence_gap + 1))
+            result += f"<DrawItem x='{diamon_placement}' y='50' z='{choices[i][1] + fence_gap + 1}' type='diamond' /> \n"
+            DIAMOND_POS.append((diamon_placement, choices[i][1] + fence_gap + 1))
     return result, DIAMOND_POS
 
 
@@ -122,7 +122,7 @@ def Map():
     assert (map_length - 2) % 5 == 0
     obs_density = 0.3
     TNT_and_TRIGGERS = _get_tnt_and_triggers(length=map_length)
-    obs, DIAMOND_POS = _get_obstacles(obs_density, map_length, difficulty=1)
+    obs, DIAMOND_POS = _get_obstacles(obs_density, map_length, difficulty=2)
 
     missionXML = f'''<?xml version="1.0" encoding="UTF-8" standalone="no" ?>
                     <Mission xmlns="http://ProjectMalmo.microsoft.com" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
@@ -143,9 +143,9 @@ def Map():
                                     <DrawCuboid x1='-30' x2='10' y1='80' y2='80' z1='-6' z2='{map_length}' type='glass'/>
                                     <DrawCuboid x1='-30' x2='-30' y1='80' y2='0' z1='-6' z2='{map_length}' type='glass'/>
                                     <DrawCuboid x1='-30' x2='10' y1='80' y2='0' z1='-6' z2='-6' type='glass'/>
-                                    <DrawCuboid x1='-30' x2='8' y1='80' y2='48' z1='{map_length + 3}' z2='{map_length + 3}' type='glass'/>
+                                    <DrawCuboid x1='-30' x2='8' y1='80' y2='0' z1='{map_length + 3}' z2='{map_length + 3}' type='glass'/>
                                     <DrawCuboid x1='-30' x2='10' y1='10' y2='10' z1='-6' z2='{map_length}' type='glass'/>
-                                    <DrawCuboid x1='10' x2='10' y1='80' y2='10' z1='-6' z2='{map_length}' type='diamond_block'/>
+                                    <DrawCuboid x1='10' x2='10' y1='80' y2='10' z1='-6' z2='{map_length+2}' type='diamond_block'/>
                                     <DrawCuboid x1='-1' x2='2' y1='47' y2='47' z1='0' z2='{map_length}' type='stone'/>
                                     <DrawCuboid x1='-1' x2='2' y1='49' y2='49' z1='-1' z2='{map_length}' type='diamond_block'/> 
                                     <DrawCuboid x1='3' x2='3' y1='50' y2='50' z1='-1' z2='{map_length}' type='dark_oak_fence'/>
@@ -171,6 +171,7 @@ def Map():
                      <Block type='emerald_block' reward='10'/>
                      <Block type="glass" reward='-2'/>
                      <Block type="dark_oak_fence" reward='-1'/>
+                     <Block type="fire" reward='-1'/>
                  </RewardForTouchingBlockType>
                  <RewardForCollectingItem>
                      <Item type='diamond' reward='1'/>

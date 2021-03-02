@@ -72,12 +72,14 @@ class MinecraftRunner(gym.Env):
         self.max_episode_steps = MAX_EPISODE_STEPS
         self.log_frequency = 5
         self.action_dict = {
-            0: 'move 1',  # Move one block forward
-            1: 'turn 1',  # Turn 90 degrees to the right
-            2: 'turn -1',  # Turn 90 degrees to the left
-            3: 'use 1',  # For opening gates
-            4: 'jump 1'  # For jump over gates
+            0: 'move 1',  # Move forward
+            1: 'turn 1',  # Turn right
+            2: 'turn -1',  # Turn left
+            3: 'use 1',  # Start opening the gate
+            4: 'jump 1',  # Start jumping
+            5: 'stop'  # stop all current action
         }
+
 
         # Rllib Parameters
         self.action_space = Discrete(len(self.action_dict))
@@ -129,7 +131,7 @@ class MinecraftRunner(gym.Env):
 
         self.current_to_dest = DESTINATION_Z
         self.shortest_to_dest = DESTINATION_Z
-        self.agent_host.sendCommand('chat /effect @p 7 3')
+        self.agent_host.sendCommand('chat /effect @p 7 2')
         self.agent_host.sendCommand('chat /gamerule naturalRegeneration false')
         time.sleep(1.0)
 
@@ -213,15 +215,20 @@ class MinecraftRunner(gym.Env):
 
         # Get Action
         command = self.action_dict[action]
-        if command not in ['use 1', 'jump 1']:
+        if command not in ['use 1', 'jump 1', 'stop']:
             self.agent_host.sendCommand(command)
             time.sleep(0.1)
-        elif command == 'use 1' and self.open_gate:
+        elif (command == 'use 1' and self.open_gate) or \
+             (command == 'jump 1' and self.jump_gate):
             self.agent_host.sendCommand(command)
             time.sleep(0.1)
-        elif command == 'jump 1' and self.jump_gate:
-            self.agent_host.sendCommand(command)
-            time.sleep(.1)
+        elif command == 'stop':
+            self.agent_host.sendCommand("use 0")
+            self.agent_host.sendCommand("move 0")
+            self.agent_host.sendCommand("jump 0")
+            self.agent_host.sendCommand("turn 0")
+            time.sleep(0.1)
+
         self.episode_step += 1
 
         # Get Observation
