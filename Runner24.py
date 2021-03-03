@@ -72,12 +72,14 @@ class MinecraftRunner(gym.Env):
         self.max_episode_steps = MAX_EPISODE_STEPS
         self.log_frequency = 5
         self.action_dict = {
-            0: 'move 1',  # Move one block forward
-            1: 'turn 1',  # Turn 90 degrees to the right
-            2: 'turn -1',  # Turn 90 degrees to the left
-            3: 'use 1',  # For opening gates
-            4: 'jump 1'  # For jump over gates
+            0: 'move 1',  # Move forward
+            1: 'turn 1',  # Turn right
+            2: 'turn -1',  # Turn left
+            3: 'use 1',  # Start opening the gate
+            4: 'jump 1',  # Start jumping
+            5: 'stop'  # stop all current action
         }
+
 
         # Rllib Parameters
         self.action_space = Discrete(len(self.action_dict))
@@ -105,7 +107,6 @@ class MinecraftRunner(gym.Env):
     def reset(self):
         """
         Resets the environment for the next episode.
-
         Returns
             observation: <np.array> flattened initial obseravtion
         """
@@ -168,6 +169,42 @@ class MinecraftRunner(gym.Env):
 
         return world_state
 
+    def rotate(self, m, k): 
+        for l in range(4):
+            top = 0
+            bottom = self.obs_size - 1
+            left = 0
+            right = self.obs_size - 1
+            while left < right and top < bottom: 
+                for i in range(k):
+                    prev = m[l][top+1][right] 
+                    # Move top row one step left 
+                    for i in range(right, left-1, -1): 
+                        temp = m[l][top][i] 
+                        m[l][top][i] = prev 
+                        prev = temp 
+                    # Move left column one step down 
+                    for i in range(top, bottom+1): 
+                        temp = m[l][i][left] 
+                        m[l][i][left] = prev 
+                        prev = temp 
+                    # Move bottom row one step right 
+                    for i in range(left, right+1): 
+                        temp = m[l][bottom][i] 
+                        m[l][bottom][i] = prev 
+                        prev = temp 
+                    # Move right column one step up 
+                    for i in range(bottom, top-1, -1): 
+                        temp = m[l][i][right] 
+                        m[l][i][right] = prev 
+                        prev = temp 
+                top += 1
+                left += 1
+                bottom -= 1
+                right -= 1
+                k -= 1
+        return m
+
     def obs_diamond(self, agent_x, agent_z):
         # Get observation matrix and agent row/col
         sight = int((OBS_SIZE - 1) / 2)
@@ -199,11 +236,8 @@ class MinecraftRunner(gym.Env):
     def step(self, action):
         """
         Take an action in the environment and return the results.
-
         Args
             action: <int> index of the action to take
-
-
         Returns
             observation: <np.array> flattened array of obseravtion
             reward: <int> reward from taking action
@@ -213,15 +247,20 @@ class MinecraftRunner(gym.Env):
 
         # Get Action
         command = self.action_dict[action]
-        if command not in ['use 1', 'jump 1']:
+        if command not in ['use 1', 'jump 1', 'stop']:
             self.agent_host.sendCommand(command)
             time.sleep(0.1)
-        elif command == 'use 1' and self.open_gate:
+        elif (command == 'use 1' and self.open_gate) or \
+             (command == 'jump 1' and self.jump_gate):
             self.agent_host.sendCommand(command)
             time.sleep(0.1)
-        elif command == 'jump 1' and self.jump_gate:
-            self.agent_host.sendCommand(command)
-            time.sleep(.1)
+        elif command == 'stop':
+            self.agent_host.sendCommand("use 0")
+            self.agent_host.sendCommand("move 0")
+            self.agent_host.sendCommand("jump 0")
+            self.agent_host.sendCommand("turn 0")
+            time.sleep(0.1)
+
         self.episode_step += 1
 
         # Get Observation
@@ -264,10 +303,8 @@ class MinecraftRunner(gym.Env):
         """
         Use the agent observation API to get a flattened 2 x 5 x 5 grid around the agent.
         The agent is in the center square facing up.
-
         Args
             world_state: <object> current agent world state
-
         Returns
             observation: <np.array> the state observation
             allow_break_action: <bool> whether the agent is facing a diamond
@@ -308,7 +345,7 @@ class MinecraftRunner(gym.Env):
                 if DESTINATION_Z - agent_z < self.shortest_to_dest:
                     self.shortest_to_dest = DESTINATION_Z - agent_z
 
-                obs_list = ['jungle_fence_gate', 'dark_oak_fence', 'acacia_fence']
+                obs_list = ['fence_gate', 'dark_oak_fence', 'acacia_fence']
                 obs = list(self.obs_diamond(agent_x, agent_z).flatten())
                 for i in range(len(obs_list)):
                     for x in grid:
@@ -329,20 +366,37 @@ class MinecraftRunner(gym.Env):
                 # Rotate observation with orientation of agent
                 yaw = observations['Yaw']
 
-                if yaw >= 225 and yaw < 315:
-                    obs = np.rot90(obs, k=1, axes=(1, 2))
-                elif yaw >= 315 or yaw < 45:
-                    obs = np.rot90(obs, k=2, axes=(1, 2))
-                elif yaw >= 45 and yaw < 135:
-                    obs = np.rot90(obs, k=3, axes=(1, 2))
+                # if yaw >= 225 and yaw < 315:
+                #     obs = np.rot90(obs, k=1, axes=(1, 2))
+                # elif yaw >= 315 or yaw < 45:
+                #     obs = np.rot90(obs, k=2, axes=(1, 2))
+                # elif yaw >= 45 and yaw < 135:
+                #     obs = np.rot90(obs, k=3, axes=(1, 2))
 
-                obs = obs.flatten()
+                if yaw >= 202.5 and yaw < 247.5:
+                    obs = self.rotate(obs, 7)
+                elif yaw >= 247.5 and yaw < 292.5:
+                    obs = np.rot90(obs, k=1, axes=(1, 2))
+                elif yaw >= 292.5 and yaw < 337.5:
+                    obs = self.rotate(obs, 21)
+                elif yaw >= 337.5 or yaw < 22.5:
+                    obs = np.rot90(obs, k=2, axes=(1, 2))
+                elif yaw >= 22.5 and yaw < 67.5:
+                    obs = self.rotate(obs, 35)
+                elif yaw >= 67.5 and yaw < 112.5:
+                    obs = np.rot90(obs, k=3, axes=(1, 2))
+                elif yaw >= 112.5 and yaw < 157.5:
+                    obs = self.rotate(obs, 49)
+
                 if 'LineOfSight' in observations.keys():
-                    open_gate = observations['LineOfSight']['type'] == "jungle_fence_gate"
+                    open_gate = observations['LineOfSight']['type'] == "fence_gate"
                     jump_gate = observations['LineOfSight']['type'] == "acacia_fence"
 
             break
 
+        # print(obs)
+        # input("Enter:")
+        obs = obs.flatten()
         return obs, open_gate, jump_gate
 
     def GetXML(self):
@@ -353,7 +407,6 @@ class MinecraftRunner(gym.Env):
     def log_returns(self):
         """
         Log the current returns as a graph and text file
-
         Args:
             steps (list): list of global steps after each episode
             returns (list): list of total return of each episode
