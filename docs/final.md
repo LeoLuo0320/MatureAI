@@ -14,7 +14,7 @@ Compared to the status report, we have a huge update in the final version. We de
 
 # Approaches
 
-### Approach ???
+### Approach 1: Customize PPO Trainer
 Compared to the status report, we customized PPO trainer with CNN network with the video following the tutorial video provided on Campuswire. In our customized trainer class, we use Pytorch library and add three convolution layers to extract features from observation matrices. As our input matrices are not large, we use outputs from convolution layers without adding pooling layers in between, and use RELU provided by Pytorch as the activation function. Compared to using linear function with default PPO trainer, our agent learns faster and more accurate under same number of steps. 
 
 ```
@@ -45,6 +45,32 @@ Compared to the status report, we customized PPO trainer with CNN network with t
      def value_function(self):
          return self.value.squeeze(1)
 ```
+
+(Maybe use flow chart instead of code)
+
+### Approach 2: Add Reward for Approaching/ destination
+
+One issue we have for the status report is that the agent sometimes moved around instead of moving forward, and it was finally killed by TNT bombs because of staying in the same area for too long. To resolve this issue and improve the performance of our agent, we add positive rewards for approaching the destination. This reward helps our agent learn to move forward and reach the finish line with less undesirable situations, such as moving around in circles and jumping off the boundary. 
+
+```
+ old_dest = self.current_to_dest  # Used for giving reward of moving to the destination
+ old_shortest = self.shortest_to_dest
+ new_dest = self.current_to_dest
+ new_shortest = self.shortest_to_dest
+ if old_dest < new_dest:
+     reward -= 0.5
+ elif old_dest > new_dest:
+     reward += 0.5
+
+ if old_shortest < new_shortest:
+     reward -= 1
+ elif old_shortest > new_shortest:
+     reward += 1
+
+ self.episode_return += reward
+```
+
+First, our project will compare the z value of the current round and that from the last round. If our agent moves further in distance, we give it a positive reward, otherwise, we give it a negative reward. At the same time, we also compare the z value to the best history record, which is the closest block that our agent has reached to the destination. If our agent breaks the record, we give it a positive reward, else we give it a negative reward as punishment. From the evaluation result, we conclude that this reward undoubtfully contributes to improving survival time of our agent. 
 
 
 # Evaluation
