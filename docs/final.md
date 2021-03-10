@@ -14,6 +14,38 @@ Compared to the status report, we have a huge update in the final version. We de
 
 # Approaches
 
+### Approach ???
+Compared to the status report, we customized PPO trainer with CNN network with the video following the tutorial video provided on Campuswire. In our customized trainer class, we use Pytorch library and add three convolution layers to extract features from observation matrices. As our input matrices are not large, we use outputs from convolution layers without adding pooling layers in between, and use RELU provided by Pytorch as the activation function. Compared to using linear function with default PPO trainer, our agent learns faster and more accurate under same number of steps. 
+
+```
+ class MyModel(TorchModelV2, nn.Module):
+     def __init__(self, *args, **kwargs):
+         TorchModelV2.__init__(self, *args, **kwargs)
+         nn.Module.__init__(self)
+
+         self.conv1 = nn.Conv2d(4, 32, kernel_size=7, padding=3)
+         self.conv2 = nn.Conv2d(32, 32, kernel_size=7, padding=3)
+         self.conv3 = nn.Conv2d(32, 32, kernel_size=7, padding=3)
+         self.policy_layer = nn.Linear(32*15*15, 5)
+         self.value_layer = nn.Linear(32*15*15, 1)
+         self.value = None
+
+     def forward(self, input_dict, state, seq_lens):
+         x = input_dict['obs']
+         x = F.relu(self.conv1(x))
+         x = F.relu(self.conv2(x))
+         x = F.relu(self.conv3(x))
+         x = x.flatten(start_dim=1)
+
+         policy = self.policy_layer(x)
+         self.value = self.value_layer(x)
+
+         return policy, state
+
+     def value_function(self):
+         return self.value.squeeze(1)
+```
+
 
 # Evaluation
 
@@ -21,6 +53,7 @@ Compared to the status report, we have a huge update in the final version. We de
 # Resources Used
 - [RLlib](https://docs.ray.io/en/master/rllib-training.html)
 - [Pytorch Documentation](https://pytorch.org/docs/stable/index.html)
+- [Customized RLlib Video](https://youtu.be/nMzoYNHgLpY)
 - [Malmo API Documentation](https://microsoft.github.io/malmo/0.30.0/Documentation/index.html)
 - [Malmo Tutorial](http://microsoft.github.io/malmo/0.30.0/Python_Examples/Tutorial.pdf)
 - [OpenCV](https://opencv.org/)
