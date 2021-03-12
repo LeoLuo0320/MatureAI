@@ -48,7 +48,9 @@ Compared to the status report, we customized PPO trainer with CNN network with t
 
 (Maybe use flow chart instead of code)
 
-### Approach 2: Add Reward for Approaching/ destination
+### Approach 2: Optimize Reward 
+
+#### Adding Reward for Approaching destination
 
 One issue we have for the status report is that the agent sometimes moved around instead of moving forward, and it was finally killed by TNT bombs because of staying in the same area for too long. To resolve this issue and improve the performance of our agent, we add positive rewards for approaching the destination. This reward helps our agent learn to move forward and reach the finish line with less undesirable situations, such as moving around in circles and jumping off the boundary. 
 
@@ -70,7 +72,17 @@ One issue we have for the status report is that the agent sometimes moved around
  self.episode_return += reward
 ```
 
-First, our project will compare the z value of the current round and that from the last round. If our agent moves further in distance, we give it a positive reward, otherwise, we give it a negative reward. At the same time, we also compare the z value to the best history record, which is the closest block that our agent has reached to the destination. If our agent breaks the record, we give it a positive reward, else we give it a negative reward as punishment. From the evaluation result, we conclude that this reward undoubtfully contributes to improving survival time of our agent. 
+First, our project will compare the z value of the current round and that from the last round. Whenever this shortest distance is updated, we give it +1 reward since it means the agent is moving towards the destination. On the other hand, if the agent is moving towards the opposite direction, we give it -0.5 reward. We do not give it -1 reward since moving towards the opposite direction may not always be a bad thing since it may on its way towards the diamond. From the evaluation result, we conclude that this reward undoubtfully contributes to improving survival time of our agent. 
+
+#### Reward Summury
+For the final version, we consider 5 factors when giving our agent rewards. Those factors are survival time in seconds, if the distance to the destination is smaller, collecting diamonds, reaching walls, and reaching the destination. The following is the reward formula. 
+
+    R(s) = 1 * SurvivalTime + 1 * CloserToDest – 0.5* FartherToDest + 1* CollectingDiamonds -  1 * ReachWalls + 10 * ReachDest
+
+As a survival game, it is intuitive to use survival time as rewards. We use “RewardForTimeTaken” in the XML documentation to give reward to agent by counting the time it survives. Since one tick in Minecraft is 0.05s in real world, we give 0.05 reward for every tick it survives in the game, which is the same as +1 reward per second.
+
+Then, we want the agent to move in the right direction, i.e. towards the destination, while still be able to make turns since it should bypass the obstacles and collect diamonds. So we have rewards such as “CloserToDest”, “FartherToDest”, “ReachWalls”. For “CloserToDest” and “FartherToDest”, we record the shortest distance to the destination when the agent moves. For “ReachWalls”, we check if the agent is touching the wall’s type, which is “dark_oak_fence”. If so, the agent gets -1 reward since moving to the wall is just wasting time and the agent may die. Finally, we give the agent +1 reward whenever it collects the diamond and +10 reward when it reaches the destination.
+
 
 
 # Evaluation
