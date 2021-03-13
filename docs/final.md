@@ -19,31 +19,39 @@ Compared to the status report, we have a huge update in the final version. In th
 
 ### 2.2 Obstacle Types
 
-##### 1 Road Destruction(Difficulty: easy, Deterministic)
+##### **1 Road Destruction(Difficulty: easy, Deterministic)**
 
-![tnt](.\img\tnt.gif)
+<p align="center">
+<img width="350" src=".\img\tnt.gif">
+</p>
 
 The initially the agent will have 6 second to run before the first TNT explodes. 
 
-##### 2 Simple Jumping( Difficulty: easy, Deterministic)
+##### **2 Simple Jumping( Difficulty: easy, Deterministic)**
 
-![jump_fence](.\img\jump_fence.gif)
+<p align="center">
+<img width="350" src=".\img\jump_fence.gif">
+</p>
 
 The agent needs to step onto the slab, perform the jump action, and walk through the gate.
 
-##### 3 Opening Door (Difficulty: medium, Stochastic)
+##### **3 Opening Door (Difficulty: medium, Stochastic)**
 
-![door_open](.\img\door_open.gif)
+<p align="center">
+<img width="350" src=".\img\door_open.gif">
+</p>
 
 The agent needs to perform 'open action', and immediately perform 'stop action' and walk through the gate. There will be only two doors generated randomly for the agent to open and the other two are fences that the agent need to move the corresponding gate and open it.
 
-##### 4 Avoiding Fireball (Difficulty: hard, Stochastic)
+##### **4 Avoiding Fireball (Difficulty: hard, Stochastic)**
 
-![ghost](.\img\ghost.gif)
+<p align="center">
+<img width="350" src=".\img\ghost.gif">
+</p>
 
 The agent needs to avoid the fireballs that the ghost shoots, and also the fire after the explosion. Because our obstacles are made of wood, the fire will ignite the fences and the agent needs to avoid those as well. 
 
-##### 5 Collecting Rewards(Difficulty: medium, Stochastic)
+##### **5 Collecting Rewards(Difficulty: medium, Stochastic)**
 
 Behind each types of obstacles, our map will distribute diamond randomly as reward. The agent needs to perform the correct action and claim the reward as soon as possible because of the following explosive and the fire balls will burn the reward. 
 
