@@ -58,10 +58,10 @@ Behind each types of obstacles, our map will distribute diamond randomly as rewa
 
 
 
-# 3 Approaches
+# 3. Approaches
 
 ### Approach 1: Customize PPO Trainer
-Compared to the status report, we customized PPO trainer with CNN network with the video following the tutorial video provided on Campuswire. In our customized trainer class, we use PyTorch library and add three convolution layers to extract features from observation matrices. As our input matrices are not large, we use outputs from convolution layers without adding pooling layers in between, and use RELU provided by PyTorch as the activation function. Compared to using linear function with default PPO trainer, our agent learns faster and more accurate under same number of steps. 
+Compared to the status report, we customized PPO trainer with CNN network instead of the default model to let the agent learn spatial information of the environment. In our customized trainer class, we use PyTorch library and add three convolution layers to extract features from observation matrices. As our input matrices are not large, we use outputs from convolution layers without adding pooling layers in between and use RELU provided by PyTorch as the activation function. Compared to using linear function with default PPO trainer, our agent learns faster and more accurate under same number of steps.
 
 ```
  class MyModel(TorchModelV2, nn.Module):
@@ -127,7 +127,9 @@ For the final version, we consider 5 factors when giving our agent rewards. Thos
 
 As a survival game, it is intuitive to use survival time as rewards. We use “RewardForTimeTaken” in the XML documentation to give reward to agent by counting the time it survives. Since one tick in Minecraft is 0.05s in real world, we give 0.05 reward for every tick it survives in the game, which is the same as +1 reward per second.
 
-Then, we want the agent to move in the right direction, i.e. towards the destination, while still be able to make turns since it should bypass the obstacles and collect diamonds. So we have rewards such as “CloserToDest”, “FartherToDest”, “ReachWalls”. For “CloserToDest” and “FartherToDest”, we record the shortest distance to the destination when the agent moves. For “ReachWalls”, we check if the agent is touching the wall’s type, which is “dark_oak_fence”. If so, the agent gets -1 reward since moving to the wall is just wasting time and the agent may die. Finally, we give the agent +1 reward whenever it collects the diamond and +10 reward when it reaches the destination.
+Then, we want the agent to move in the right direction, i.e. towards the destination, while still be able to make turns since it should bypass the obstacles and collect diamonds. So we have rewards such as “CloserToDest”, “FartherToDest”, “ReachWalls”. For “CloserToDest” and “FartherToDest”, we record the shortest distance to the destination when the agent moves. For “ReachWalls”, we check if the agent is touching the wall’s type, which is “dark_oak_fence”. If so, the agent gets -1 reward since moving to the wall is just wasting time and the agent may die. 
+
+Finally, we give the agent +1 reward whenever it collects the diamond and +10 reward when it reaches the destination.
 
 
 
