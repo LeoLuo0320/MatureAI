@@ -3,16 +3,54 @@ layout: default
 title: Final Report
 ---
 
-# Video Summury
+# Video Summary
 
 
-# Project Summary
-Our project MatureAI is a survival game. Our map is composed of a 4 blocks wide running track that is surrounded by dark oak fences. Rewards and obstacles are randomly generated for each round. The goal of our agent is to survive as long as possible, collect diamonds when moving forward, and reach the target location. When collecting diamonds, our agent needs to bypass and avoid obstacles such as stones, fences, and gates. Depending on these obstacles, our agent learns to take appropriate actions, such as opening the gate, step on the stone and jump over the fence. The agent is dropped at the start line of the track for each game, and we use Redstone circuitry to create explosions and destroy the road as time goes by, so the agent learns to move forward and reach the finish line, or it will die.
-
-Compared to the status report, we have a huge update in the final version. We designed 4 levels of difficulty: trainee, introductory, medium, and advance. For the status report, we only handled the trainee level, which uses discrete action space and only contains one obstacle, i.e., fence gates. Our agent only needs to open the gate and walk through the gate. For the final version, we implemented the advanced level and changed our map dramatically to make our project more complex and interesting. Firstly, we used continuous action space, which is more challenging and requires more precise actions compared to discrete action space. For the obstacles, apart from using fence gates, we added Acacia fences, slab stones, and diamonds to our map. To bypass acacia fences, our agent needs to step onto the slab stone and jump over the fence. Sometimes the agent will find the track is blocked by a combination of fences and fence gates, so our agent needs to discern the fence gate and open it to pass this blocking line. Also, the agent will get extra reward if it collects diamonds when it is bypassing the obstacles. Collecting the diamond is not necessary for survival. On the other hand, the agent may even die because of collecting the diamond since it may not have enough time to move forward and bypassing the obstacles. To improve the performance of the agent, we customized the PPO trainer with PyTorch CNN model and optimized our reward function. Compared to the status report, the map is more complex, our agent bypasses more obstacles and survives much longer.
+# 1.Project Summary
+Our project MatureAI is a survival game. Our map is composed of a 4 blocks wide running track surrounded by dark oak fences. Rewards and obstacles are randomly generated for each round. The goal of our agent is to survive as long as possible, to collect diamonds when moving forward, and to reach the target location. Depending on the obstacle, our agent learns to take appropriate actions, such as opening the gate, stepping on the stone and jumping over the fence. The agent is dropped at the start line of the track for each game, and we use Redstone circuitry to create explosions and destroy the road as time goes by, so the agent learns to move forward and reach the finish line, or it will die. To improve the performance of the agent, we customized the PPO trainer with PyTorch CNN model and optimized our reward function. Compared to the status report, the map is more complex, our agent bypasses more obstacles and survives much longer.
 
 
-# Approaches
+
+# 2. Learning Environment
+
+### 2.1 Environment Summary 
+
+Compared to the status report, we have a huge update in the final version. In the status report our environment is simple and deterministic, but for the final report we changed the map into more complex and stochastic environment. In the status report we planned to implement four levels of difficulty, but because of the limitation of Malmo platform (there is no dashing action for the agent) we only train our agent on the introductory level. To compensate the change, we added some interesting creatures and map generating mechanism, such as using continuous action space and random reward distribution. 
+
+### 2.2 Obstacle Types
+
+##### 1 Road Destruction(Difficulty: easy, Deterministic)
+
+![tnt](.\img\tnt.gif)
+
+The initially the agent will have 6 second to run before the first TNT explodes. 
+
+##### 2 Simple Jumping( Difficulty: easy, Deterministic)
+
+![jump_fence](.\img\jump_fence.gif)
+
+The agent needs to step onto the slab, perform the jump action, and walk through the gate.
+
+##### 3 Opening Door (Difficulty: medium, Stochastic)
+
+![door_open](.\img\door_open.gif)
+
+The agent needs to perform 'open action', and immediately perform 'stop action' and walk through the gate. There will be only two doors generated randomly for the agent to open and the other two are fences that the agent need to move the corresponding gate and open it.
+
+##### 4 Avoiding Fireball (Difficulty: hard, Stochastic)
+
+![ghost](.\img\ghost.gif)
+
+The agent needs to avoid the fireballs that the ghost shoots, and also the fire after the explosion. Because our obstacles are made of wood, the fire will ignite the fences and the agent needs to avoid those as well. 
+
+##### 5 Collecting Rewards(Difficulty: medium, Stochastic)
+
+Behind each types of obstacles, our map will distribute diamond randomly as reward. The agent needs to perform the correct action and claim the reward as soon as possible because of the following explosive and the fire balls will burn the reward. 
+
+
+
+
+# 3 Approaches
 
 ### Approach 1: Customize PPO Trainer
 Compared to the status report, we customized PPO trainer with CNN network with the video following the tutorial video provided on Campuswire. In our customized trainer class, we use PyTorch library and add three convolution layers to extract features from observation matrices. As our input matrices are not large, we use outputs from convolution layers without adding pooling layers in between, and use RELU provided by PyTorch as the activation function. Compared to using linear function with default PPO trainer, our agent learns faster and more accurate under same number of steps. 
@@ -85,10 +123,10 @@ Then, we want the agent to move in the right direction, i.e. towards the destina
 
 
 
-# Evaluation
+# 4 Evaluation
 
 
-# Resources Used
+# 5 Resources Used
 - [RLlib](https://docs.ray.io/en/master/rllib-training.html)
 - [Pytorch Documentation](https://pytorch.org/docs/stable/index.html)
 - [Customized RLlib Video](https://youtu.be/nMzoYNHgLpY)
