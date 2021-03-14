@@ -145,7 +145,7 @@ for each layer of observation:
         update n to n - 1
 ```
 <p align="center">
-<img width="250" alt="rotate-illustration" src="rotate.png">
+<img width="250" alt="rotate-illustration" src="img/rotate.png">
 </p>
 
 
