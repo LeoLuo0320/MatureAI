@@ -22,7 +22,7 @@ Compared to the status report, we have a huge update in the final version. In th
 ##### **1 Road Destruction(Difficulty: easy, Deterministic)**
 
 <p align="center">
-<img width="350" src=".\img\tnt.gif">
+<img width="350" src="img/tnt.gif">
 </p>
 
 The initially the agent will have 6 second to run before the first TNT explodes. 
@@ -30,7 +30,7 @@ The initially the agent will have 6 second to run before the first TNT explodes.
 ##### **2 Simple Jumping( Difficulty: easy, Deterministic)**
 
 <p align="center">
-<img width="350" src=".\img\jump_fence.gif">
+<img width="350" src="img/ump_fence.gif">
 </p>
 
 The agent needs to step onto the slab, perform the jump action, and walk through the gate.
@@ -38,7 +38,7 @@ The agent needs to step onto the slab, perform the jump action, and walk through
 ##### **3 Opening Door (Difficulty: medium, Stochastic)**
 
 <p align="center">
-<img width="350" src=".\img\door_open.gif">
+<img width="350" src="img/door_open.gif">
 </p>
 
 The agent needs to perform 'open action', and immediately perform 'stop action' and walk through the gate. There will be only two doors generated randomly for the agent to open and the other two are fences that the agent need to move the corresponding gate and open it.
@@ -46,7 +46,7 @@ The agent needs to perform 'open action', and immediately perform 'stop action' 
 ##### **4 Avoiding Fireball (Difficulty: hard, Stochastic)**
 
 <p align="center">
-<img width="350" src=".\img\ghost.gif">
+<img width="350" src="img/ghost.gif">
 </p>
 
 The agent needs to avoid the fireballs that the ghost shoots, and also the fire after the explosion. Because our obstacles are made of wood, the fire will ignite the fences and the agent needs to avoid those as well. 
@@ -131,6 +131,22 @@ Then, we want the agent to move in the right direction, i.e. towards the destina
 
 Finally, we give the agent +1 reward whenever it collects the diamond and +10 reward when it reaches the destination.
 
+
+### Approach 3: Customize rotate
+Inspired by the extra credit part from assignment two, we customized rotate functionality of our agent. In the status report, our agent suffers from partial observability. The observation continues to assume the agent is centered and at right angles, which means that the agent’s knowledge of its own location has an orientation error. To make our observation more accurate but not too trivial and complex, we create a customized rotate function for our agent to mitigate orientation error. 
+
+In our rotate function, we eliminate the orientation error of ±45 degrees. Our observation space is 15 x 15 x 5, and the following is our rotate logic and pseudocode. Please see our source code for more details. 
+
+```
+n = number of rotation times for the outermost observation space
+for each layer of observation:
+    from outside to inside observation space:
+        rotate observation space n times
+        update n to n - 1
+```
+<p align="center">
+<img width="250" alt="rotate-illustration" src="rotate.png">
+</p>
 
 
 # 4 Evaluation
