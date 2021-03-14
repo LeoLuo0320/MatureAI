@@ -167,6 +167,7 @@ for each layer of observation:
 <img width="250" alt="rotate-illustration" src="img/rotate.png">
 </p>
 # 5 Evaluations
+
 ### 5.1 Qualitative
 We qualitatively evaluate the performance of our agent through the video of the training process. At the beginning of the training process, we find the agent often moves aimlessly, i.e., moves towards the walls, makes meaningless turns, and moves backwards. Also, the agent has a hard time bypassing the obstacles and thus quickly dies after the TNT explodes. In this phase, the total reward for a task is about +10 since the agent has 6s before the first TNT explodes, which is about +6 rewards. After about 40,000 steps, the agent can mostly avoid touching the boundaries and has a sense that moving towards the destination can survive longer. But still, the agent has some trouble bypassing different kinds of obstacles and dies on their way to the finish line. During this phase, the total reward for a task is between +20 and +30. Finally, after 100,0000 steps, the agent gradually becomes an expert of the game and seldom takes useless actions. It will open the gate, jump over the fence, dodge the fireball, and collect the diamond on its way. Reaching the finish line is easy after 100,0000 steps.
 
