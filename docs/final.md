@@ -19,23 +19,29 @@ Compared to the status report, we have a huge update in the final version. In th
 
 ### 2.2 Obstacle Types
 
-##### **1 Road Destruction(Difficulty: easy, Deterministic)**
+<p align="center">
+    <b>1 Road Destruction(Difficulty: Easy, Deterministic)</b>
+</p>
 
 <p align="center">
 <img width="350" src=".\img\tnt.gif">
 </p>
 
-The initially the agent will have 6 second to run before the first TNT explodes. 
+The initially the agent will have 11.5 second to run before the first TNT explodes. For each obstacle, the agent will have additional 1.5 second to escape from the explosive. 
 
-##### **2 Simple Jumping( Difficulty: easy, Deterministic)**
+<p align="center">
+    <b> 2 Simple Jumping( Difficulty: easy, Deterministic)</b>
+</p>
 
 <p align="center">
 <img width="350" src=".\img\jump_fence.gif">
 </p>
 
-The agent needs to step onto the slab, perform the jump action, and walk through the gate.
+The agent needs to step onto the slab, perform the jump action, and walk through the gate. 'Stop action' is optional for this type of obstacle. 
 
-##### **3 Opening Door (Difficulty: medium, Stochastic)**
+<p align="center">
+    <b> 3 Opening Door (Difficulty: medium, Stochastic)</b>
+</p>
 
 <p align="center">
 <img width="350" src=".\img\door_open.gif">
@@ -43,15 +49,20 @@ The agent needs to step onto the slab, perform the jump action, and walk through
 
 The agent needs to perform 'open action', and immediately perform 'stop action' and walk through the gate. There will be only two doors generated randomly for the agent to open and the other two are fences that the agent need to move the corresponding gate and open it.
 
-##### **4 Avoiding Fireball (Difficulty: hard, Stochastic)**
+
+
+<p align="center">
+    <b>4 Avoiding Fireball (Difficulty: hard, Stochastic)</b>
+</p>
 
 <p align="center">
 <img width="350" src=".\img\ghost.gif">
 </p>
-
 The agent needs to avoid the fireballs that the ghost shoots, and also the fire after the explosion. Because our obstacles are made of wood, the fire will ignite the fences and the agent needs to avoid those as well. 
 
-##### **5 Collecting Rewards(Difficulty: medium, Stochastic)**
+<p align="center">
+    <b>5 Collecting Rewards(Difficulty: medium, Stochastic)</b>
+</p>
 
 Behind each types of obstacles, our map will distribute diamond randomly as reward. The agent needs to perform the correct action and claim the reward as soon as possible because of the following explosive and the fire balls will burn the reward. 
 
@@ -60,7 +71,8 @@ Behind each types of obstacles, our map will distribute diamond randomly as rewa
 
 # 3 Approaches
 
-### Approach 1: Customize PPO Trainer
+### 3.1 Approach: Customize PPO Trainer
+
 Compared to the status report, we customized PPO trainer with CNN network with the video following the tutorial video provided on Campuswire. In our customized trainer class, we use PyTorch library and add three convolution layers to extract features from observation matrices. As our input matrices are not large, we use outputs from convolution layers without adding pooling layers in between, and use RELU provided by PyTorch as the activation function. Compared to using linear function with default PPO trainer, our agent learns faster and more accurate under same number of steps. 
 
 ```
@@ -94,11 +106,29 @@ Compared to the status report, we customized PPO trainer with CNN network with t
 
 (Maybe use flow chart instead of code)
 
-### Approach 2: Optimize Reward 
 
-#### Adding Reward for Approaching destination
 
-One issue we have for the status report is that the agent sometimes moved around instead of moving forward, and it was finally killed by TNT bombs because of staying in the same area for too long. To resolve this issue and improve the performance of our agent, we add positive rewards for approaching the destination. This reward helps our agent learn to move forward and reach the finish line with less undesirable situations, such as moving around in circles and jumping off the boundary. 
+### 3.2 Discussion
+
+
+
+# 4 Heuristics
+
+### 4.1 Reward Formula
+
+For the final version, we consider several factors when giving our agent rewards. The reward formula is consist of two part:  **W(s) = P(s) + R(s)**
+
+<img src=".\img\equation.jpg" alt="img" style="zoom: 33%;" />
+
+<img src=".\img\equation2.jpg" alt="img" style="zoom: 33%;" />
+
+### 4.2 Discussion for Optimizing Reward 
+
+As a survival game, it is intuitive to use survival time as rewards. We use “RewardForTimeTaken” in the XML documentation to give reward to agent by counting the time it survives. Since one tick in Minecraft is 0.05s in real world, we give 0.05 reward for every tick it survives in the game, which is the same as +1 reward per second.
+
+Firstly, when observing the training process of the agent,  we notice that the agent tends to stay at the same spot and keep rotating its self instead of moving. Thus, to speed up the learning process we added small punishment for staying stationary. The same rationale applies we want the agent to move in the right direction, i.e. towards the destination, while still be able to make turns since it should bypass the obstacles and collect diamonds. So we have rewards such as “CloserToDest”, “FartherToDest”, “ReachWalls”. For “CloserToDest” and “FartherToDest”, we record the shortest distance to the destination when the agent moves. For “ReachBounds”, we check if the agent is touching the wall’s type, which is “dark_oak_fence”. If so, the agent gets -1 reward since moving to the wall is just wasting time and the agent may die. Finally, we give the agent +1 reward whenever it collects the diamond and +10 reward when it reaches the destination.
+
+What is more, one issue we have for the status report is that the agent sometimes move around instead of moving forward, and it was finally killed by TNT bombs because of staying in the same area for too long. To resolve this issue and improve the performance of our agent, we add positive rewards for approaching the destination. This reward helps our agent learn to move forward and reach the finish line with less undesirable situations, such as moving around in circles and jumping off the boundary. 
 
 ```
  old_dest = self.current_to_dest  # Used for giving reward of moving to the destination
@@ -118,23 +148,12 @@ One issue we have for the status report is that the agent sometimes moved around
  self.episode_return += reward
 ```
 
-First, our project will compare the z value of the current round and that from the last round. Whenever this shortest distance is updated, we give it +1 reward since it means the agent is moving towards the destination. On the other hand, if the agent is moving towards the opposite direction, we give it -0.5 reward. We do not give it -1 reward since moving towards the opposite direction may not always be a bad thing since it may on its way towards the diamond. From the evaluation result, we conclude that this reward undoubtfully contributes to improving survival time of our agent. 
+Our project will compare the z value of the current round and that from the last round. Whenever this shortest distance is updated, we give it +1 reward since it means the agent is moving towards the destination. On the other hand, if the agent is moving towards the opposite direction, we give it -0.5 reward. We do not give it -1 reward since moving towards the opposite direction may not always be a bad thing since it may on its way towards the diamond. From the evaluation result, we conclude that this reward undoubtfully contributes to improving survival time of our agent. 
 
-#### Reward Summury
-For the final version, we consider 5 factors when giving our agent rewards. Those factors are survival time in seconds, if the distance to the destination is smaller, collecting diamonds, reaching walls, and reaching the destination. The following is the reward formula. 
-
-    R(s) = 1 * SurvivalTime + 1 * CloserToDest – 0.5* FartherToDest + 1* CollectingDiamonds -  1 * ReachWalls + 10 * ReachDest
-
-As a survival game, it is intuitive to use survival time as rewards. We use “RewardForTimeTaken” in the XML documentation to give reward to agent by counting the time it survives. Since one tick in Minecraft is 0.05s in real world, we give 0.05 reward for every tick it survives in the game, which is the same as +1 reward per second.
-
-Then, we want the agent to move in the right direction, i.e. towards the destination, while still be able to make turns since it should bypass the obstacles and collect diamonds. So we have rewards such as “CloserToDest”, “FartherToDest”, “ReachWalls”. For “CloserToDest” and “FartherToDest”, we record the shortest distance to the destination when the agent moves. For “ReachWalls”, we check if the agent is touching the wall’s type, which is “dark_oak_fence”. If so, the agent gets -1 reward since moving to the wall is just wasting time and the agent may die. Finally, we give the agent +1 reward whenever it collects the diamond and +10 reward when it reaches the destination.
+# 5 Evaluations
 
 
-
-# 4 Evaluation
-
-
-# 5 Resources Used
+# 6 Resources Used
 - [RLlib](https://docs.ray.io/en/master/rllib-training.html)
 - [Pytorch Documentation](https://pytorch.org/docs/stable/index.html)
 - [Customized RLlib Video](https://youtu.be/nMzoYNHgLpY)
