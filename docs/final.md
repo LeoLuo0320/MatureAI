@@ -121,16 +121,15 @@ For the final version, we consider several factors when giving our agent rewards
 
 <img src=".\img\equation2.jpg" alt="img" style="zoom: 33%;" />
 
-### 4.2 Discussion for Optimizing Reward 
+### 4.2 Optimizing Reward 
 
 As a survival game, it is intuitive to use survival time as rewards. We use “RewardForTimeTaken” in the XML documentation to give reward to agent by counting the time it survives. Since one tick in Minecraft is 0.05s in real world, we give 0.05 reward for every tick it survives in the game, which is the same as +1 reward per second.
 
-Firstly, when observing the training process of the agent,  we notice that the agent tends to stay at the same spot and keep rotating its self instead of moving. Thus, to speed up the learning process we added small punishment for staying stationary. The same rationale applies we want the agent to move in the right direction, i.e. towards the destination, while still be able to make turns since it should bypass the obstacles and collect diamonds. So we have rewards such as “CloserToDest”, “FartherToDest”, “ReachWalls”. For “CloserToDest” and “FartherToDest”, we record the shortest distance to the destination when the agent moves. For “ReachBounds”, we check if the agent is touching the wall’s type, which is “dark_oak_fence”. If so, the agent gets -1 reward since moving to the wall is just wasting time and the agent may die. Additionally, we will give the agent +1 reward whenever it collects the diamond and +10 reward when it reaches the destination.
-
-What is more, one issue we have for the status report is that the agent sometimes move around instead of moving forward, and it was finally killed by TNT bombs because of staying in the same area for too long. To resolve this issue and improve the performance of our agent, we add positive rewards for approaching the destination. This reward helps our agent learn to move forward and reach the finish line with less undesirable situations, such as moving around in circles and jumping off the boundary. 
+Then, when observing the training process of the agent,  we notice that the agent tends to stay at the same spot and keep rotating its self instead of moving. Thus, to speed up the learning process we added small punishment for staying stationary. The same rationale applies we want the agent to move in the right direction, i.e. towards the destination, while still be able to make turns since it should bypass the obstacles and collect diamonds. So we have rewards such as “CloserToDest”, “FartherToDest”, “ReachWalls”. For “CloserToDest” and “FartherToDest”, we record the shortest distance to the destination when the agent moves. Whenever this shortest distance is updated, we give it +1 reward since it means the agent is moving towards the destination. If the agent is moving towards the opposite direction, we give it -0.5 reward. We do not give it -1 reward since moving towards the opposite direction may not always be a bad thing since it may on its way towards the diamond. For “ReachBounds”, we check if the agent is touching the wall’s type, which is “dark_oak_fence”. If so, the agent gets -1 reward since moving to the wall is just wasting time and the agent may die.
 
 ```
- old_dest = self.current_to_dest  # Used for giving reward of moving to the destination
+ # Used for giving reward of moving towards the destination
+ old_dest = self.current_to_dest
  old_shortest = self.shortest_to_dest
  new_dest = self.current_to_dest
  new_shortest = self.shortest_to_dest
@@ -147,7 +146,9 @@ What is more, one issue we have for the status report is that the agent sometime
  self.episode_return += reward
 ```
 
-Our project will compare the z value of the current round and that from the last round. Whenever this shortest distance is updated, we give it +1 reward since it means the agent is moving towards the destination. On the other hand, if the agent is moving towards the opposite direction, we give it -0.5 reward. We do not give it -1 reward since moving towards the opposite direction may not always be a bad thing since it may on its way towards the diamond. From the evaluation result, we conclude that this reward undoubtfully contributes to improving survival time of our agent. 
+Finally, we give the agent +1 reward whenever it collects the diamond and +10 reward when it reaches the destination.
+
+From the evaluation result, we conclude that these rewards undoubtfully contributes to improving survival time of our agent. 
 
 
 ### 4.3 Additional Approach: Customize rotate
