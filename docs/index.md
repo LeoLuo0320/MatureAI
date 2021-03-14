@@ -11,7 +11,7 @@ title:  Home
 - [Final](final.html)
 
 <p align="center">
-<img width="1000" alt="ppo trainer - graph" src="cover.png">
+<img width="1000" alt="ppo trainer - graph" src="img/cover.png">
 </p>
 
 

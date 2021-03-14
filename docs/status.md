@@ -18,7 +18,7 @@ MatureAI is a survival game. The goal of this project is to train our agent to s
 Given our relatively simple environment, we are using PPO trainer with default parameters from rllib for reinforcement learning. The trainer class helps us train, checkpoint model, and compute actions. Please see the image attached below as a reference to how the trainer works.
 
 <p align="center">
-<img width="700" alt="ppo trainer - graph" src="rllib.png">
+<img width="700" alt="ppo trainer - graph" src="img/rllib.png">
 </p>
 
 
@@ -34,13 +34,13 @@ Currently we designed 4 levels of difficulty: Trainee, Introductory, Medium, and
 Trainee: It only contains fence gate. The agent needs to open the gate and walk through the gate.
 
 <p align="center">
-<img src="obs_0.JPG" alt="obs_0" style="zoom: 33%;" />
+<img src="img/obs_0.JPG" alt="obs_0" style="zoom: 33%;" />
 </p>
 
 Introductory: It will contain fence gate and level 1 obstacle as show below. The agent needs to step onto the slab and jump.
 
 <p align="center">
-<img src="obs_1.JPG" alt="obs_1" style="zoom: 33%;" />
+<img src="img/obs_1.JPG" alt="obs_1" style="zoom: 33%;" />
 </p>
 
 
@@ -50,7 +50,7 @@ Introductory: It will contain fence gate and level 1 obstacle as show below. The
 Medium: It will contain fence gate, level 1 obstacle and level 2 obstacles as show below. The agent needs to step onto the slab and jump with certain acceleration.
 
 <p align="center">
-<img src="obs_2.JPG" alt="obs_2" style="zoom: 33%;" />
+<img src="img/obs_2.JPG" alt="obs_2" style="zoom: 33%;" />
 </p>
 
 
@@ -58,7 +58,7 @@ Medium: It will contain fence gate, level 1 obstacle and level 2 obstacles as sh
 Advance: It will contain all obstacles above and the agent needs to step onto the slab and jump with maximum acceleration.
 
 <p align="center">
-<img src="obs_3.JPG" alt="obs_3" style="zoom: 33%;" />
+<img src="img/obs_3.JPG" alt="obs_3" style="zoom: 33%;" />
 </p>
 
 ### Action Space
@@ -94,7 +94,7 @@ To evaluate our model quantitatively, we set positive and negative rewards for t
 Based on the reward system described in Approach and logic designed above, we have the reward graph below. According to the graph, we could see that our agent is learning to grab golds and diamonds and avoid hitting obstacles. 
 
 <p align="center">
-<img width="700" alt="reward-graph" src="reward.png">
+<img width="700" alt="reward-graph" src="img/reward.png">
 </p>
 
 To evaluate our model qualitatively, we will keep track of the action taken by our agent. It is expected to survive as long as possible, which means that our agent should bypass obstacles and avoid hitting stones on both sides of the road, without taking greater risk of dying.
