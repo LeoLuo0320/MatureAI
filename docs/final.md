@@ -30,7 +30,7 @@ The initially the agent will have 6 second to run before the first TNT explodes.
 ##### **2 Simple Jumping( Difficulty: easy, Deterministic)**
 
 <p align="center">
-<img width="350" src="img/ump_fence.gif">
+<img width="350" src="img/jump_fence.gif">
 </p>
 
 The agent needs to step onto the slab, perform the jump action, and walk through the gate.
