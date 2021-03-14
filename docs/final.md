@@ -166,6 +166,7 @@ for each layer of observation:
 <p align="center">
 <img width="250" alt="rotate-illustration" src="img/rotate.png">
 </p>
+
 # 5 Evaluations
 
 ### 5.1 Qualitative
