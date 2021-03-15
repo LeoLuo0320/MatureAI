@@ -3,7 +3,7 @@ layout: default
 title: Final Report
 ---
 
-## Video Summary
+# Video Summary
 
 
 # 1. Project Summary
@@ -108,7 +108,7 @@ Compared to the status report, we customized PPO trainer with CNN network instea
 
 
 ### 3.2 Rewards
-Reward Formula
+**Reward Formula**
 
 For the final version, we consider several factors when giving our agent rewards. The reward formula is consist of two part:  **V(s) = P(s) + R(s)**
 
@@ -117,7 +117,7 @@ For the final version, we consider several factors when giving our agent rewards
 <img src=".\img\equation2.jpg" alt="img" style="zoom: 33%;" />
 
 
-Optimizing Reward
+**Optimizing Reward**
 
 As a survival game, it is intuitive to use survival time as rewards. We use “RewardForTimeTaken” in the XML documentation to give reward to agent by counting the time it survives. Since one tick in Minecraft is 0.05s in real world, we give 0.05 reward for every tick it survives in the game, which is the same as +1 reward per second.
 
