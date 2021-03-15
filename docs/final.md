@@ -164,66 +164,13 @@ for each layer of observation:
 
 
 
-# 4 Heuristics
 
-### 4.1 Reward Formula
+# 4 Evaluations
 
-For the final version, we consider several factors when giving our agent rewards. The reward formula is consist of two part:  **V(s) = P(s) + R(s)**
-
-<img src=".\img\equation.jpg" alt="img" style="zoom: 33%;" />
-
-<img src=".\img\equation2.jpg" alt="img" style="zoom: 33%;" />
-
-### 4.2 Optimizing Reward 
-
-As a survival game, it is intuitive to use survival time as rewards. We use “RewardForTimeTaken” in the XML documentation to give reward to agent by counting the time it survives. Since one tick in Minecraft is 0.05s in real world, we give 0.05 reward for every tick it survives in the game, which is the same as +1 reward per second.
-
-Then, when observing the training process of the agent,  we notice that the agent tends to stay at the same spot and keep rotating its self instead of moving. Thus, to speed up the learning process we added small punishment for staying stationary. The same rationale applies we want the agent to move in the right direction, i.e. towards the destination, while still be able to make turns since it should bypass the obstacles and collect diamonds. So we have rewards such as “CloserToDest”, “FartherToDest”, “ReachWalls”. For “CloserToDest” and “FartherToDest”, we record the shortest distance to the destination when the agent moves. Whenever this shortest distance is updated, we give it +1 reward since it means the agent is moving towards the destination. If the agent is moving towards the opposite direction, we give it -0.5 reward. We do not give it -1 reward since moving towards the opposite direction may not always be a bad thing since it may on its way towards the diamond. For “ReachBounds”, we check if the agent is touching the wall’s type, which is “dark_oak_fence”. If so, the agent gets -1 reward since moving to the wall is just wasting time and the agent may die.
-
-```
- # Used for giving reward of moving towards the destination
- old_dest = self.current_to_dest
- old_shortest = self.shortest_to_dest
- new_dest = self.current_to_dest
- new_shortest = self.shortest_to_dest
- if old_dest < new_dest:
-     reward -= 0.5
- elif old_dest > new_dest:
-     reward += 0.5
-
- if old_shortest < new_shortest:
-     reward -= 1
- elif old_shortest > new_shortest:
-     reward += 1
-
- self.episode_return += reward
-```
-
-Finally, we give the agent +1 reward whenever it collects the diamond and +10 reward when it reaches the destination.
-
-From the evaluation result, we conclude that these rewards undoubtfully contributes to improving survival time of our agent. 
-
-
-### 4.3 Additional Approach: Customize rotate
-Inspired by the extra credit part from assignment two, we customized rotate functionality of our agent. In the status report, our agent suffers from partial observability. The observation continues to assume the agent is centered and at right angles, which means that the agent’s knowledge of its own location has an orientation error. To make our observation more accurate but not too trivial and complex, we create a customized rotate function for our agent to mitigate orientation error. 
-
-In our rotate function, we eliminate the orientation error of ±45 degrees. Our observation space is 15 x 15 x 5, and the following is our rotate logic and pseudocode. Please see our source code for more details. 
-
-```
-n = number of rotation times for the outermost observation space
-for each layer of observation:
-    from outside to inside observation space:
-        rotate observation space n times
-        update n to n - 1
-```
-<p align="center">
-<img width="250" alt="rotate-illustration" src="img/rotate.png">
-</p>
-
-# 5 Evaluations
-
-### 5.1 Qualitative
+### 4.1 Qualitative Evaluation
 We qualitatively evaluate the performance of our agent through the video of the training process. At the beginning of the training process, we find the agent often moves aimlessly, i.e., moves towards the walls, makes meaningless turns, and moves backwards. Also, the agent has a hard time bypassing the obstacles and thus quickly dies after the TNT explodes. In this phase, the total reward for a task is about +10 since the agent has 6s before the first TNT explodes, which is about +6 rewards. After about 40,000 steps, the agent can mostly avoid touching the boundaries and has a sense that moving towards the destination can survive longer. But still, the agent has some trouble bypassing different kinds of obstacles and dies on their way to the finish line. During this phase, the total reward for a task is between +20 and +30. Finally, after 100,0000 steps, the agent gradually becomes an expert of the game and seldom takes useless actions. It will open the gate, jump over the fence, dodge the fireball, and collect the diamond on its way. Reaching the finish line is easy after 100,0000 steps.
+
+### 4.2 Quantitative Evaluation
 
 
 # 6 Resources Used
