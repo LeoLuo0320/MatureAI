@@ -72,7 +72,7 @@ Behind each types of obstacles, our map will distribute diamond randomly as rewa
 
 # 3. Approaches
 
-### 3.1 Approach 1: Customize PPO Trainer
+### 3.1 Customize PPO Trainer
 Compared to the status report, we customized PPO trainer with CNN network instead of the default model to let the agent learn spatial information of the environment. In our customized trainer class, we use PyTorch library and add three convolution layers to extract features from observation matrices. As our input matrices are not large, we use outputs from convolution layers without adding pooling layers in between and use RELU provided by PyTorch as the activation function. Compared to using linear function with default PPO trainer, our agent learns faster and more accurate under same number of steps.
 ```
  class MyModel(TorchModelV2, nn.Module):
@@ -145,7 +145,7 @@ Finally, we give the agent +1 reward whenever it collects the diamond and +10 re
 
 From the evaluation result, we conclude that these rewards undoubtfully contributes to improving survival time of our agent. 
 
-### 3.3 Additional Approach: Customize rotate
+### 3.3 Customize rotate
 Inspired by the extra credit part from assignment two, we customized rotate functionality of our agent. In the status report, our agent suffers from partial observability. The observation continues to assume the agent is centered and at right angles, which means that the agent’s knowledge of its own location has an orientation error. To make our observation more accurate but not too trivial and complex, we create a customized rotate function for our agent to mitigate orientation error. 
 
 In our rotate function, we eliminate the orientation error of ±45 degrees. Our observation space is 15 x 15 x 5, and the following is our rotate logic and pseudocode. Please see our source code for more details. 
