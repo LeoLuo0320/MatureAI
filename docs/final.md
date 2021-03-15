@@ -4,6 +4,8 @@ title: Final Report
 ---
 
 ## Video Summary
+Video Link: [MatureAI Final Presentation](https://youtu.be/3gF5fztNZXI)
+<iframe width="560" height="315" src="https://www.youtube.com/embed/3gF5fztNZXI" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
 
 
 ## 1. Project Summary
