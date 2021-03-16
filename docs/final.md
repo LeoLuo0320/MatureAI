@@ -3,24 +3,22 @@ layout: default
 title: Final Report
 ---
 
-## Video Summary
+## 1. Video Summary
 Video Link: [MatureAI Final Presentation](https://youtu.be/3gF5fztNZXI)
 <iframe width="560" height="315" src="https://www.youtube.com/embed/3gF5fztNZXI" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
 
 <br/><br/>
-## 1. Project Summary
+
+## 2. Project Summary
 Our project MatureAI is a survival game. Our map is composed of a 4 blocks wide running track surrounded by dark oak fences. Rewards and obstacles are randomly generated for each round. The goal of our agent is to survive as long as possible, to collect diamonds when moving forward, and to reach the target location. Depending on the obstacle, our agent learns to take appropriate actions, such as opening the gate, stepping on the stone and jumping over the fence. The agent is dropped at the start line of the track for each game, and we use Redstone circuitry to create explosions and destroy the road as time goes by, so the agent learns to move forward and reach the finish line, or it will die. To improve the performance of the agent, we customized the PPO trainer with PyTorch CNN model and optimized our reward function. Compared to the status report, the map is more complex, our agent bypasses more obstacles and survives much longer.
 
-
 <br/><br/>
-## 2. Learning Environment
 
-### 2.1 Environment Summary 
-
+## 3. Approaches
+### 3.1 Environment Summary
 Compared to the status report, we have a huge update in the final version. In the status report our environment is simple and deterministic, but for the final report we changed the map into more complex and stochastic environment. In the status report we planned to implement four levels of difficulty, but because of the limitation of Malmo platform (there is no dashing action for the agent) we only train our agent on the introductory level. To compensate the change, we added some interesting creatures and map generating mechanism, such as using continuous action space and random reward distribution. 
- 
-### 2.2 Obstacle Types
 
+### 3.2 Obstacle Types
 <p align="center">
     <b>1 Road Destruction(Difficulty: Easy, Deterministic)</b>
 </p>
@@ -69,11 +67,7 @@ The agent needs to avoid the fireballs that the ghost shoots, and also the fire 
 
 Behind each types of obstacles, our map will distribute diamond randomly as reward. The agent needs to perform the correct action and claim the reward as soon as possible because of the following explosive and the fire balls will burn the reward. 
 
-
-<br/><br/>
-## 3. Approaches
-
-### 3.1 Customize PPO Trainer
+### 3.3 Customize PPO Trainer
 In status report, we used PPO trainer with default parameters from rllib for reinforcement learning. The trainer class helps us train, checkpoint model, and compute actions. 
 <p align="center">
 <img width="700" alt="ppo trainer - graph" src="img/rllib.png">
@@ -156,7 +150,7 @@ Finally, we give the agent +1 reward whenever it collects the diamond and +10 re
 From the evaluation result, we conclude that these rewards undoubtfully contributes to improving survival time of our agent. 
  
 ### 3.3 Customize rotate
-Inspired by the extra credit part from assignment two, we customized rotate functionality of our agent. In the status report, our agent suffers from partial observability. The observation continues to assume the agent is centered and at right angles, which means that the agent’s knowledge of its own location has an orientation error. To make our observation more accurate but not too trivial and complex, we create a customized rotate function for our agent to mitigate orientation error. 
+Inspired by the extra credit part from assignment two, we customized rotate functionality of our agent. In the status report, our agent suffers from partial observability. The observation continues to assume the agent is centered and at right angles, which means that the agent’s knowledge of its own location has an orientation error. To make our observation more accurate but not too trivial or complex, we create a customized rotate function for our agent to mitigate orientation error. 
 
 In our rotate function, we eliminate the orientation error of ±45 degrees. Our observation space is 15 x 15 x 5, and the following is our rotate logic and pseudocode. Please see our source code for more details. 
 
