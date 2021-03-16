@@ -71,21 +71,31 @@ Behind each types of obstacles, our map will distribute diamond randomly as rewa
 
 
 
-
 ## 3. Approaches
 
 ### 3.1 Customize PPO Trainer
-Compared to the status report, we customized PPO trainer with CNN network instead of the default model to let the agent learn spatial information of the environment. In our customized trainer class, we use PyTorch library and add three convolution layers to extract features from observation matrices. As our input matrices are not large, we use outputs from convolution layers without adding pooling layers in between and use RELU provided by PyTorch as the activation function. Compared to using linear function with default PPO trainer, our agent learns faster and more accurate under same number of steps.
+In status report, we used PPO trainer with default parameters from rllib for reinforcement learning. The trainer class helps us train, checkpoint model, and compute actions. 
+<p align="center">
+<img width="700" alt="ppo trainer - graph" src="img/rllib.png">
+</p>
+
+For final report, we customized PPO trainer with CNN network instead of the default model to let the agent learn spatial information of the environment. Technically, deep learning CNN models pass input matrices through a series of convolution layers with filter kernals, pooling, fully connected layers and apply Softmax function to classify an object with probabilistic values between 0 and 1. The below figure is a complete flow of CNN to process an input and classifies the objects based on values.
+<p align="center">
+<img width="700" src="img/cnn_demonstration.png">
+</p>
+
+For our project, we use PyTorch library and add three convolution layers to better extract features from observation matrices. Implementing one-hot encoding, we separate observation matrices into 5 layers for observation matrices, since we have 5 different types of obstacles. As the observation size is 15 by 15, the actual sizes of our input matrices are (5, 15, 15). Therefore, for the first convolution layer, the input channel number is 5. Then we set the output channel number to 32, as we usually choose the power of 2, and 32 is a common choice. As our input matrices are not large, we use outputs from convolution layers directly without adding pooling layers in between and use RELU provided by PyTorch as the activation function. For the remaining 2 convolution layer, we keep the input and output channel the same, and finally flatten the output and our customized model is generated. Compared to using linear function with default PPO trainer, our agent learns faster and more accurate under same number of steps. The following is our CNN model. 
+
 ```
  class MyModel(TorchModelV2, nn.Module):
      def __init__(self, *args, **kwargs):
          TorchModelV2.__init__(self, *args, **kwargs)
          nn.Module.__init__(self)
 
-         self.conv1 = nn.Conv2d(4, 32, kernel_size=7, padding=3)
+         self.conv1 = nn.Conv2d(5, 32, kernel_size=7, padding=3)
          self.conv2 = nn.Conv2d(32, 32, kernel_size=7, padding=3)
          self.conv3 = nn.Conv2d(32, 32, kernel_size=7, padding=3)
-         self.policy_layer = nn.Linear(32*15*15, 5)
+         self.policy_layer = nn.Linear(32*15*15, 7)
          self.value_layer = nn.Linear(32*15*15, 1)
          self.value = None
 
@@ -105,18 +115,15 @@ Compared to the status report, we customized PPO trainer with CNN network instea
          return self.value.squeeze(1)
 ```
 
-(Maybe use flow chart instead of code)
-
-
 
 ### 3.2 Rewards
 **Reward Formula**
 
 For the final version, we consider several factors when giving our agent rewards. The reward formula is consist of two part:  **V(s) = P(s) + R(s)**
 
-<img src=".\img\equation.jpg" alt="img" style="zoom: 33%;" />
+<img src="img/equation.jpg" alt="img" style="zoom: 33%;" />
 
-<img src=".\img\equation2.jpg" alt="img" style="zoom: 33%;" />
+<img src="img/equation2.jpg" alt="img" style="zoom: 33%;" />
 
 
 **Optimizing Reward**
