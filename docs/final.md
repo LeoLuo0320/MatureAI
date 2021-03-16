@@ -180,14 +180,14 @@ We quantitatively evaluate the performance of our agent through plotting the tot
 
 Rewards Return
 <p>
-<img width="500" alt="rotate-illustration" src="../Evaluations/returns_UpdateStepFunction.png">
+<img width="700" alt="rotate-illustration" src="../Evaluations/returns_UpdateStepFunction.png">
 </p>
 
 <br/><br/>
 
 Pure Survival Time Return
 <p>
-<img width="500" alt="rotate-illustration" src="../Evaluations/returns_OpenGateDiscrete.png">
+<img width="700" alt="rotate-illustration" src="../Evaluations/returns_OpenGateDiscrete.png">
 </p>
 
 # 6 Resources Used
