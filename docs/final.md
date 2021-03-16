@@ -175,15 +175,18 @@ We qualitatively evaluate the performance of our agent through the video of the 
 
 ### 4.2 Quantitative Evaluation
 We quantitatively evaluate the performance of our agent through plotting the total rewards and survival time of each episode. The higher the total rewards the agent gets, the longer it survives, the more diamonds it gets and the closer it is to the finish line. Moreover, since our setup is a survival game, we also plot purely the surivial time so that we can evaluate the survival time of the agent more directly. According to the plots below, it is clear that the agent learns overtime and has better performance. Both the plots of rewards and pure survival time have increasing trends.
+
 <br/><br/>
 
 Rewards Return
-<p align="center">
+<p>
 <img width="250" alt="rotate-illustration" src="../Evaluations/returns_UpdateStepFunction.png">
 </p>
 
+<br/><br/>
+
 Pure Survival Time Return
-<p align="center">
+<p>
 <img width="250" alt="rotate-illustration" src="../Evaluations/returns_OpenGateDiscrete.png">
 </p>
 
