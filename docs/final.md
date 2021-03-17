@@ -152,7 +152,7 @@ From the evaluation result, we conclude that these rewards undoubtfully contribu
 ### 3.3 Customize rotate
 Inspired by the extra credit part from assignment two, we customized rotate functionality of our agent. In the status report, our agent suffers from partial observability. The observation continues to assume the agent is centered and at right angles, which means that the agent’s knowledge of its own location has an orientation error. To make our observation more accurate but not too trivial or complex, we create a customized rotate function for our agent to mitigate orientation error. 
 
-In our rotate function, we eliminate the orientation error of ±45 degrees. Our observation space is 15 x 15 x 5, and the following is our rotate logic and pseudocode. Please see our source code for more details. 
+In our rotate function, we eliminate the orientation error of ±45 degrees. Our observation space is (5, 15, 15), and the following is our rotate logic and pseudocode. Please see our source code for more details. 
 
 ```
 n = number of rotation times for the outermost observation space
@@ -161,6 +161,9 @@ for each layer of observation:
         rotate observation space n times
         update n to n - 1
 ```
+
+If we want to rotate the matrix by 45 degrees to the right, elements on the boundary of our observation matrix needs to be rotated 7 times to the left. Then inner elements next to the the boundary needs to be rotated 6 times, and we perform this rotation until we reach the center of the matrix. We did not divide the rotation angle into too small pieces. The first reason is that 90 cannot be perfectly divided by 14, and we have to round the result to determine rotation times. Meanwhile, dividing the rotation angle into too small pieces sometimes keep our agent changing its forward direction in the same spot without actually moving forward. The following is a graphic illustration of our customized rotate function. 
+
 <p align="center">
 <img width="250" alt="rotate-illustration" src="img/rotate.png">
 </p>
@@ -190,9 +193,10 @@ Pure Survival Time Return
 <img width="700"  src="img/SurvivalTime.png">
 </p>
 
-# 6 Resources Used
+# 5 Resources Used
 - [RLlib](https://docs.ray.io/en/master/rllib-training.html)
 - [Pytorch Documentation](https://pytorch.org/docs/stable/index.html)
+- [Understanding of Convolutional Neural Network (CNN) — Deep Learning](https://medium.com/@RaghavPrabhu/understanding-of-convolutional-neural-network-cnn-deep-learning-99760835f148)
 - [Customized RLlib Video](https://youtu.be/nMzoYNHgLpY)
 - [Malmo API Documentation](https://microsoft.github.io/malmo/0.30.0/Documentation/index.html)
 - [Malmo Tutorial](http://microsoft.github.io/malmo/0.30.0/Python_Examples/Tutorial.pdf)
