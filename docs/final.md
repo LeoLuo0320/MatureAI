@@ -193,6 +193,14 @@ Pure Survival Time Return
 <img width="700"  src="img/SurvivalTime.png">
 </p>
 
+<br/><br/>
+
+Random Choice Return (Baseline)
+<p>
+<img width="700"  src="img/Baseline.png">
+</p>
+
+
 # 5 Resources Used
 - [RLlib](https://docs.ray.io/en/master/rllib-training.html)
 - [Pytorch Documentation](https://pytorch.org/docs/stable/index.html)
