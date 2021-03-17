@@ -110,7 +110,7 @@ For our project, we use PyTorch library and add three convolution layers to bett
 ```
 
  
-### 3.2 Rewards
+### 3.4 Rewards
 **Reward Formula**
 
 For the final version, we consider several factors when giving our agent rewards. The reward formula is consist of two part:  **V(s) = P(s) + R(s)**
