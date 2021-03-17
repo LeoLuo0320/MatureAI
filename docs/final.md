@@ -149,7 +149,7 @@ Finally, we give the agent +1 reward whenever it collects the diamond and +10 re
 
 From the evaluation result, we conclude that these rewards undoubtfully contributes to improving survival time of our agent. 
  
-### 3.3 Customize rotate
+### 3.5 Customize rotate
 Inspired by the extra credit part from assignment two, we customized rotate functionality of our agent. In the status report, our agent suffers from partial observability. The observation continues to assume the agent is centered and at right angles, which means that the agent’s knowledge of its own location has an orientation error. To make our observation more accurate but not too trivial or complex, we create a customized rotate function for our agent to mitigate orientation error. 
 
 In our rotate function, we eliminate the orientation error of ±45 degrees. Our observation space is (5, 15, 15), and the following is our rotate logic and pseudocode. Please see our source code for more details. 
