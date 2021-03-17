@@ -67,7 +67,10 @@ The agent needs to avoid the fireballs that the ghost shoots, and also the fire 
 
 Behind each types of obstacles, our map will distribute diamond randomly as reward. The agent needs to perform the correct action and claim the reward as soon as possible because of the following explosive and the fire balls will burn the reward. 
 
-### 3.3 Customize PPO Trainer
+### 3.3 Observations
+Our agent has 6 layers of observations. Each layer is a 15 * 15 matrix with value 0 or 1. For each layer, it observes one kind of blocks. From the 1st layer to the 6th layer, the agent observes the blocks of type "diamond", "fence_gate", "dark_oak_fence", "acacia_fence", "emerald_block" or "fence". If one entry of a matrix is 1, it means it is one of the type mentioned above.
+
+### 3.4 Customize PPO Trainer
 In status report, we used PPO trainer with default parameters from rllib for reinforcement learning. The trainer class helps us train, checkpoint model, and compute actions. 
 <p align="center">
 <img width="700" alt="ppo trainer - graph" src="img/rllib.png">
@@ -110,7 +113,7 @@ For our project, we use PyTorch library and add three convolution layers to bett
 ```
 
  
-### 3.4 Rewards
+### 3.5 Rewards
 **Reward Formula**
 
 For the final version, we consider several factors when giving our agent rewards. The reward formula is consist of two part:  **V(s) = P(s) + R(s)**
@@ -149,7 +152,7 @@ Finally, we give the agent +1 reward whenever it collects the diamond and +10 re
 
 From the evaluation result, we conclude that these rewards undoubtfully contributes to improving survival time of our agent. 
  
-### 3.5 Customize rotate
+### 3.6 Customize rotate
 Inspired by the extra credit part from assignment two, we customized rotate functionality of our agent. In the status report, our agent suffers from partial observability. The observation continues to assume the agent is centered and at right angles, which means that the agent’s knowledge of its own location has an orientation error. To make our observation more accurate but not too trivial or complex, we create a customized rotate function for our agent to mitigate orientation error. 
 
 In our rotate function, we eliminate the orientation error of ±45 degrees. Our observation space is (5, 15, 15), and the following is our rotate logic and pseudocode. Please see our source code for more details. 
@@ -168,9 +171,8 @@ If we want to rotate the matrix by 45 degrees to the right, elements on the boun
 <img width="250" alt="rotate-illustration" src="img/rotate.png">
 </p>
 
-
-
 <br/><br/>
+
 ## 4. Evaluations
 
 ### 4.1 Qualitative Evaluation
@@ -200,6 +202,7 @@ Random Choice Return (Baseline)
 <img width="700"  src="img/Basline.png">
 </p>
 
+<br/><br/>
 
 # 5 Resources Used
 - [RLlib](https://docs.ray.io/en/master/rllib-training.html)
