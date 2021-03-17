@@ -197,7 +197,7 @@ Pure Survival Time Return
 
 Random Choice Return (Baseline)
 <p>
-<img width="700"  src="img/Baseline.png">
+<img width="700"  src="img/Basline.png">
 </p>
 
 
