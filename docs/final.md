@@ -62,19 +62,15 @@ The agent needs to avoid the fireballs that the ghost shoots, and also the fire 
 <p align="center">
     <b>5 Collecting Rewards(Difficulty: medium, Stochastic)</b>
 </p>
-
 Behind each type of obstacle, our map will distribute diamonds randomly as the reward. The agent needs to perform the correct action and claim the reward as soon as possible because of the following explosive and the fireballs will burn the reward. 
 
 <p align="center">
-    <b>6 Set initial HP of the agent</b>
+    <b>6 Initial HP of the agent</b>
 </p>
 
-Sometimes the TNT explosion cannot kill our agent directly, so our agent does free fall movement until it hits the ground and dies. This falling time unexpectedly counts into the survival time, which gives our agent positive rewards. At the same time, TNT may not destroy the runway, and our agent still remains on the race track. Therefore, we decided to set the initial HP of the agent to 1. 
-```
-self.agent_host.sendCommand('chat /effect @p 7 3')
-self.agent_host.sendCommand('chat /gamerule naturalRegeneration false')
-```
-The "effect @p 7" in the first line gives our agent instant damage and reduces 3 HP. The 3 at the end means we will use this instant damage three times, which makes our agent only have 1 HP before start running. The second line stops the agent from auto recovering from the damage. 
+Because sometimes the TNT explosion cannot kill our agent directly(if the environ is too simple), so our agent does free fall movement until it hits the ground and dies, which will adds some noise to our learning process. To accommodate different difficulties, we give the agent different initial health at the start of the game, using command block. 
+
+
 
 ### 3.3 Action Space
 Our project use continuous actions with the following action space.
