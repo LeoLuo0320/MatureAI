@@ -56,7 +56,7 @@ The agent needs to perform 'open action', and immediately perform 'stop action' 
 </p>
 
 <p align="center">
-<img width="350" src=".\img\ghost.gif">
+<img width="350" src="img/ghost.gif">
 </p>
 
 The agent needs to avoid the fireballs that the ghost shoots, and also the fire after the explosion. Because our obstacles are made of wood, the fire will ignite the fences and the agent needs to avoid those as well. 
@@ -66,6 +66,18 @@ The agent needs to avoid the fireballs that the ghost shoots, and also the fire 
 </p>
 
 Behind each types of obstacles, our map will distribute diamond randomly as reward. The agent needs to perform the correct action and claim the reward as soon as possible because of the following explosive and the fire balls will burn the reward. 
+
+<p align="center">
+    <b>6 Set initial HP of the agent</b>
+</p>
+
+Sometimes the TNT explosion cannot kill our agent directly, so our agent does free fall movement until it hits the ground and dies. This falling time unexpectedly counts into the survival time, which gives our agent positive rewards. At the same time, TNT may not completely destroy the runway, and our agent still remains on the race track. Therefore, we decided to set the initial HP of the agent to 1. 
+```
+self.agent_host.sendCommand('chat /effect @p 7 3')
+self.agent_host.sendCommand('chat /gamerule naturalRegeneration false')
+```
+The "effect @p 7" in the first line gives our agent instant damage and reduces 3 HP. The 3 at the end means we will use this instant damage three times, which makes our agent only have 1 HP before start running. The second line stops the agent from auto recovering from the damage. 
+
 
 ### 3.3 Observations
 Our agent has 6 layers of observations. Each layer is a 15 * 15 matrix with value 0 or 1. For each layer, it observes one kind of blocks. From the 1st layer to the 6th layer, the agent observes the blocks of type "diamond", "fence_gate", "dark_oak_fence", "acacia_fence", "emerald_block" or "fence". If one entry of a matrix is 1, it means it is one of the type mentioned above.
