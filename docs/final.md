@@ -10,13 +10,11 @@ Video Link: [MatureAI Final Presentation](https://youtu.be/3gF5fztNZXI)
 <br/><br/>
 
 ## 2. Project Summary
-Our project MatureAI is a survival game. Our map is composed of a 4 blocks wide running track surrounded by dark oak fences. Rewards and obstacles are randomly generated for each round. The goal of our agent is to survive as long as possible, to collect diamonds when moving forward, and to reach the target location. Depending on the obstacle, our agent learns to take appropriate actions, such as opening the gate, stepping on the stone and jumping over the fence. The agent is dropped at the start line of the track for each game, and we use Redstone circuitry to create explosions and destroy the road as time goes by, so the agent learns to move forward and reach the finish line, or it will die. To improve the performance of the agent, we customized the PPO trainer with PyTorch CNN model and optimized our reward function. Compared to the status report, the map is more complex, our agent bypasses more obstacles and survives much longer.
-
-<br/><br/>
+Our project MatureAI is a survival game. Our map is composed of a 4 blocks wide running track surrounded by dark oak fences. Rewards and obstacles are randomly generated for each round. The goal of our agent is to survive as long as possible, to collect diamonds when moving forward, and to reach the target location. Depending on the obstacle, our agent learns to take appropriate actions, such as opening the gate, stepping on the stone, and jumping over the fence. The agent is dropped at the start line of the track for each game, and we use Redstone circuitry to create explosions and destroy the road as time goes by, so the agent learns to move forward and reach the finish line, or it will die. To improve the performance of the agent, we customized the PPO trainer with PyTorch CNN model and optimized our reward function. Compared to the status report, the map is more complex, our agent bypasses more obstacles and survives much longer.<br/>
 
 ## 3. Approaches
 ### 3.1 Environment Summary
-Compared to the status report, we have a huge update in the final version. In the status report our environment is simple and deterministic, but for the final report we changed the map into more complex and stochastic environment. In the status report we planned to implement four levels of difficulty, but because of the limitation of Malmo platform (there is no dashing action for the agent) we only train our agent on the introductory level. To compensate the change, we added some interesting creatures and map generating mechanism, such as using continuous action space and random reward distribution. 
+Compared to the status report, we have a huge update in the final version. In the status report our environment is simple and deterministic, but for the final report, we changed the map into a more complex and stochastic environment. In the status report, we planned to implement four levels of difficulty, but because of the limitation of the Malmo platform (there is no dashing action for the agent), we only train our agent on the introductory level. To compensate for the change, we added some interesting creatures and map generating mechanisms, such as using continuous action space and random reward distribution. 
 
 ### 3.2 Obstacle Types
 <p align="center">
@@ -27,7 +25,7 @@ Compared to the status report, we have a huge update in the final version. In th
 <img width="350" src="img/tnt.gif">
 </p>
 
-The initially the agent will have 11.5 second to run before the first TNT explodes. For each obstacle, the agent will have additional 1.5 second to escape from the explosive. 
+Initially, the agent will have 11.5 seconds to run before the first TNT explodes. For each obstacle, the agent will have an additional 1.5 seconds to escape from the explosive. 
 
 <p align="center">
     <b> 2 Simple Jumping( Difficulty: easy, Deterministic)</b>
@@ -47,7 +45,7 @@ The agent needs to step onto the slab, perform the jump action, and walk through
 <img width="350" src="img/door_open.gif">
 </p>
 
-The agent needs to perform 'open action', and immediately perform 'stop action' and walk through the gate. There will be only two doors generated randomly for the agent to open and the other two are fences that the agent need to move the corresponding gate and open it.
+The agent needs to perform 'open action', and immediately perform 'stop action' and walk through the gate. There will be only two doors generated randomly for the agent to open and the other two are fences that the agent needs to move the corresponding gate and open.
 
 
 
@@ -65,13 +63,13 @@ The agent needs to avoid the fireballs that the ghost shoots, and also the fire 
     <b>5 Collecting Rewards(Difficulty: medium, Stochastic)</b>
 </p>
 
-Behind each types of obstacles, our map will distribute diamond randomly as reward. The agent needs to perform the correct action and claim the reward as soon as possible because of the following explosive and the fire balls will burn the reward. 
+Behind each type of obstacle, our map will distribute diamonds randomly as the reward. The agent needs to perform the correct action and claim the reward as soon as possible because of the following explosive and the fireballs will burn the reward. 
 
 <p align="center">
     <b>6 Set initial HP of the agent</b>
 </p>
 
-Sometimes the TNT explosion cannot kill our agent directly, so our agent does free fall movement until it hits the ground and dies. This falling time unexpectedly counts into the survival time, which gives our agent positive rewards. At the same time, TNT may not completely destroy the runway, and our agent still remains on the race track. Therefore, we decided to set the initial HP of the agent to 1. 
+Sometimes the TNT explosion cannot kill our agent directly, so our agent does free fall movement until it hits the ground and dies. This falling time unexpectedly counts into the survival time, which gives our agent positive rewards. At the same time, TNT may not destroy the runway, and our agent still remains on the race track. Therefore, we decided to set the initial HP of the agent to 1. 
 ```
 self.agent_host.sendCommand('chat /effect @p 7 3')
 self.agent_host.sendCommand('chat /gamerule naturalRegeneration false')
@@ -90,23 +88,23 @@ self.action_dict = {
             5: 'stop'  # stop all current action
         }
 ```
-The continuous action space greatly increases the difficulty of taking actions for our agent since it needs to act more precisely towards the environment. One interesting challenge we met during the process is opening the gate. Since we observe the block type of the environment, even if a fence is opened, the agent may still performs the "use" action, which will then close the door and the agent cannot bypass the obstacle. To solve the problem, we add "stop" action to the action space so our agent will not only learns how to open the gate, but also learns when it is appropriate to stop. Adding this action increases the efficiency of our trainning and makes the agents perform better.
+The continuous action space greatly increases the difficulty of taking actions for our agent since it needs to act more precisely towards the environment. One interesting challenge we met during the process is opening the gate. Since we observe the block type of the environment, even if a fence is opened, the agent may still perform the "use" action, which will then close the door and the agent cannot bypass the obstacle. To solve the problem, we add a stop action to the action space so our agent will not only learns how to open the gate but also learns when it is appropriate to stop. Adding this action increases the efficiency of our training and makes the agents perform better.
 
 ### 3.4 Observations
-Our agent has 6 layers of observations. Each layer is a 15 * 15 matrix with value 0 or 1. For each layer, it observes one kind of blocks. From the 1st layer to the 6th layer, the agent observes the blocks of type "diamond", "fence_gate", "dark_oak_fence", "acacia_fence", "emerald_block" or "fence". If one entry of a matrix is 1, it means it is one of the type mentioned above.
+Our agent has 6 layers of observations. Each layer is a 15 * 15 matrix with a value 0 or 1. For each layer, it observes one kind of block. From the 1st layer to the 6th layer, the agent observes the blocks of type "diamond", "fence_gate", "dark_oak_fence", "acacia_fence", "emerald_block" or "fence". If one entry of a matrix is 1, it means it is one of the types mentioned above.
 
 ### 3.5 Customize PPO Trainer
-In status report, we used PPO trainer with default parameters from rllib for reinforcement learning. The trainer class helps us train, checkpoint model, and compute actions. 
+In the status report, we used PPO trainer with default parameters from rllib for reinforcement learning. The trainer class helps us train, checkpoint model, and compute actions. 
 <p align="center">
 <img width="700" alt="ppo trainer - graph" src="img/rllib.png">
 </p>
 
-For final report, we customized PPO trainer with CNN network instead of the default model to let the agent learn spatial information of the environment. Technically, deep learning CNN models pass input matrices through a series of convolution layers with filter kernals, pooling, fully connected layers and apply Softmax function to classify an object with probabilistic values between 0 and 1. The below figure is a complete flow of CNN to process an input and classifies the objects based on values.
+For the final report, we customized PPO trainer with CNN network instead of the default model to let the agent learn spatial information of the environment. Technically, deep learning CNN models pass input matrices through a series of convolution layers with filter kernels, pooling, fully connected layers, and apply Softmax function to classify an object with probabilistic values between 0 and 1. The below figure is a complete flow of CNN to process an input and classifies the objects based on values.
 <p align="center">
 <img width="700" src="img/cnn_demonstration.png">
 </p>
 
-For our project, we use PyTorch library and add three convolution layers to better extract features from observation matrices. Implementing one-hot encoding, we separate observation matrices into 5 layers for observation matrices, since we have 5 different types of obstacles. As the observation size is 15 by 15, the actual sizes of our input matrices are (5, 15, 15). Therefore, for the first convolution layer, the input channel number is 5. Then we set the output channel number to 32, as we usually choose the power of 2, and 32 is a common choice. As our input matrices are not large, we use outputs from convolution layers directly without adding pooling layers in between and use RELU provided by PyTorch as the activation function. For the remaining 2 convolution layer, we keep the input and output channel the same, and finally flatten the output and our customized model is generated. Compared to using linear function with default PPO trainer, our agent learns faster and more accurate under same number of steps. The following is our CNN model. 
+For our project, we use PyTorch library and add three convolution layers to better extract features from observation matrices. Implementing one-hot encoding, we separate observation matrices into 5 layers for observation matrices, since we have 5 different types of obstacles. As the observation size is 15 by 15, the actual sizes of our input matrices are (5, 15, 15). Therefore, for the first convolution layer, the input channel number is 5. Then we set the output channel number to 32, as we usually choose the power of 2, and 32 is a common choice. As our input matrices are not large, we use outputs from convolution layers directly without adding pooling layers in between and use RELU provided by PyTorch as the activation function. For the remaining 2 convolution layer, we keep the input and output channel the same and finally flatten the output and our customized model is generated. Compared to using a linear function with the default PPO trainer, our agent learns faster and more accurately under the same number of steps. The following is our CNN model. 
 
 ```
  class MyModel(TorchModelV2, nn.Module):
@@ -137,7 +135,7 @@ For our project, we use PyTorch library and add three convolution layers to bett
          return self.value.squeeze(1)
 ```
 
- 
+
 ### 3.6 Rewards
 **Reward Formula**
 
@@ -150,9 +148,8 @@ For the final version, we consider several factors when giving our agent rewards
 <br/><br/>
 **Reward Function Explanation and Optimization**
 
-As a survival game, it is intuitive to use survival time as rewards. We use “RewardForTimeTaken” in the XML documentation to give reward to agent by counting the time it survives. Since one tick in Minecraft is 0.05s in real world, we give 0.05 reward for every tick it survives in the game, which is the same as +1 reward per second.
-
-Then, when observing the training process of the agent,  we notice that the agent tends to stay at the same spot and keep rotating its self instead of moving. Thus, to speed up the learning process we added small punishment for staying stationary. The same rationale applies we want the agent to move in the right direction, i.e. towards the destination, while still be able to make turns since it should bypass the obstacles and collect diamonds. So we have rewards such as “CloserToDest”, “FartherToDest”, “ReachWalls”. For “CloserToDest” and “FartherToDest”, we record the shortest distance to the destination when the agent moves. Whenever this shortest distance is updated, we give it +1 reward since it means the agent is moving towards the destination. If the agent is moving towards the opposite direction, we give it -0.5 reward. We do not give it -1 reward since moving towards the opposite direction may not always be a bad thing since it may on its way towards the diamond. For “ReachBounds”, we check if the agent is touching the wall’s type, which is “dark_oak_fence”. If so, the agent gets -1 reward since moving to the wall is just wasting time and the agent may die.
+As a survival game, it is intuitive to use survival time as reward. We use “RewardForTimeTaken” in the XML documentation to give reward to agent by counting the time it survives. Since one tick in Minecraft is 0.05s in the real world, we give 0.05 reward for every tick it survives in the game, which is the same as +1 reward per second.
+Then, when observing the training process of the agent, we notice that the agent tends to stay at the same spot and keep rotating its self instead of moving. Thus, to speed up the learning process we added small punishment for staying stationary. The same rationale applies we want the agent to move in the right direction, i.e. towards the destination, while still be able to make turns since it should bypass the obstacles and collect diamonds. So we have rewards such as “CloserToDest”, “FartherToDest”, “ReachWalls”. For “CloserToDest” and “FartherToDest”, we record the shortest distance to the destination when the agent moves. Whenever this shortest distance is updated, we give it +1 reward since it means the agent is moving towards the destination. If the agent is moving in the opposite direction, we give it -0.5 reward. We do not give it -1 reward since moving towards the opposite direction may not always be a bad thing since it may on its way towards the diamond. For “ReachBounds”, we check if the agent is touching the wall’s type, which is “dark_oak_fence”. If so, the agent gets -1 reward since moving to the wall is just wasting time and the agent may die.
 
 ```
  # Used for giving reward of moving towards the destination
@@ -176,10 +173,9 @@ Then, when observing the training process of the agent,  we notice that the agen
 Finally, we give the agent +1 reward whenever it collects the diamond and +10 reward when it reaches the destination.
 
 From the evaluation result, we conclude that these rewards undoubtfully contributes to improving survival time of our agent. 
- 
+
 ### 3.7 Customize rotate
 Inspired by the extra credit part from assignment two, we customized rotate functionality of our agent. In the status report, our agent suffers from partial observability. The observation continues to assume the agent is centered and at right angles, which means that the agent’s knowledge of its own location has an orientation error. To make our observation more accurate but not too trivial or complex, we create a customized rotate function for our agent to mitigate orientation error. 
-
 In our rotate function, we eliminate the orientation error of ±45 degrees. Our observation space is (5, 15, 15), and the following is our rotate logic and pseudocode. Please see our source code for more details. 
 
 ```
@@ -190,7 +186,7 @@ for each layer of observation:
         update n to n - 1
 ```
 
-If we want to rotate the matrix by 45 degrees to the right, elements on the boundary of our observation matrix needs to be rotated 7 times to the left. Then inner elements next to the the boundary needs to be rotated 6 times, and we perform this rotation until we reach the center of the matrix. We did not divide the rotation angle into too small pieces. The first reason is that 90 cannot be perfectly divided by 14, and we have to round the result to determine rotation times. Meanwhile, dividing the rotation angle into too small pieces sometimes keep our agent changing its forward direction in the same spot without actually moving forward. The following is a graphic illustration of our customized rotate function. 
+If we want to rotate the matrix by 45 degrees to the right, elements on the boundary of our observation matrix need to be rotated 7 times to the left. Then inner elements next to the boundary need to be rotated 6 times, and we perform this rotation until we reach the center of the matrix. We did not divide the rotation angle into too small pieces. The first reason is that 90 cannot be perfectly divided by 14, and we have to round the result to determine rotation times. Meanwhile, dividing the rotation angle into too small pieces sometimes keep our agent changing its forward direction in the same spot without actually moving forward. The following is a graphic illustration of our customized rotate function. 
 
 <p align="center">
 <img width="250" alt="rotate-illustration" src="img/rotate.png">
@@ -201,10 +197,10 @@ If we want to rotate the matrix by 45 degrees to the right, elements on the boun
 ## 4. Evaluations
 
 ### 4.1 Qualitative Evaluation
-We qualitatively evaluate the performance of our agent through the video of the training process. At the beginning of the training process, we find the agent often moves aimlessly, i.e., moves towards the walls, makes meaningless turns, and moves backwards. Also, the agent has a hard time bypassing the obstacles and thus quickly dies after the TNT explodes. In this phase, the total reward for a task is about +10 since the agent has 6s before the first TNT explodes, which is about +6 rewards. After about 40,000 steps, the agent can mostly avoid touching the boundaries and has a sense that moving towards the destination can survive longer. But still, the agent has some trouble bypassing different kinds of obstacles and dies on their way to the finish line. During this phase, the total reward for a task is between +20 and +30. Finally, after 100,0000 steps, the agent gradually becomes an expert of the game and seldom takes useless actions. It will open the gate, jump over the fence, dodge the fireball, and collect the diamond on its way. Reaching the finish line is easy after 100,0000 steps.
+We qualitatively evaluate the performance of our agent through the video of the training process. At the beginning of the training process, we find the agent often moves aimlessly, i.e., moves towards the walls, makes meaningless turns, and moves backward. Also, the agent has a hard time bypassing the obstacles and thus quickly dies after the TNT explodes. In this phase, the total reward for a task is about +10 since the agent has 6s before the first TNT explodes, which is about +6 rewards. After about 40,000 steps, the agent can mostly avoid touching the boundaries and has a sense that moving towards the destination can survive longer. But still, the agent has some trouble bypassing different kinds of obstacles and dies on their way to the finish line. During this phase, the total reward for a task is between +20 and +30. Finally, after 100,0000 steps, the agent gradually becomes an expert on the game and seldom takes useless actions. It will open the gate, jump over the fence, dodge the fireball, and collect the diamond on its way. Reaching the finish line is easy after 100,0000 steps.
 
 ### 4.2 Quantitative Evaluation
-We quantitatively evaluate the performance of our agent through plotting the total rewards and survival time of each episode. We will use the agent performing random actions as our baseline, i.e. our trained model should perform much better than the agent with random actions. The higher the total rewards the agent gets, the longer it survives, the more diamonds it gets and the closer it is to the finish line. Moreover, since our setup is a survival game, we also plot purely the surivial time so that we can evaluate the survival time of the agent more directly. According to the first two plots below, it is clear that the agent learns overtime and has better performance. Both the plots of rewards and pure survival time have increasing trends. Compare the last plot with the first two, it is clear that the agent with random actions does not steadily increase its rewards returned over trainning.
+We quantitatively evaluate the performance of our agent by plotting the total rewards and survival time of each episode. We will use the agent performing random actions as our baseline, i.e. our trained model should perform much better than the agent with random actions. The higher the total rewards the agent gets, the longer it survives, the more diamonds it gets, and the closer it is to the finish line. Moreover, since our setup is a survival game, we also plot purely the survival time so that we can evaluate the survival time of the agent more directly. According to the first two plots below, it is clear that the agent learns over time and has better performance. Both the plots of rewards and pure survival time have increasing trends. Compare to the last plot with the first two, it is clear that the agent with random actions does not steadily increase its rewards returned overtraining.
 
 <br/><br/>
 
