@@ -78,11 +78,24 @@ self.agent_host.sendCommand('chat /gamerule naturalRegeneration false')
 ```
 The "effect @p 7" in the first line gives our agent instant damage and reduces 3 HP. The 3 at the end means we will use this instant damage three times, which makes our agent only have 1 HP before start running. The second line stops the agent from auto recovering from the damage. 
 
+### 3.3 Action Space
+Our project use continuous actions with the following action space.
+```
+self.action_dict = {
+            0: 'move 1',  # Move forward
+            1: 'turn 1',  # Turn right
+            2: 'turn -1',  # Turn left
+            3: 'use 1',  # Start opening the gate
+            4: 'jump 1',  # Start jumping
+            5: 'stop'  # stop all current action
+        }
+```
+The continuous action space greatly increases the difficulty of taking actions for our agent since it needs to act more precisely towards the environment. One interesting challenge we met during the process is opening the gate. Since we observe the block type of the environment, even if a fence is opened, the agent may still performs the "use" action, which will then close the door and the agent cannot bypass the obstacle. To solve the problem, we add "stop" action to the action space so our agent will not only learns how to open the gate, but also learns when it is appropriate to stop. Adding this action increases the efficiency of our trainning and makes the agents perform better.
 
-### 3.3 Observations
+### 3.4 Observations
 Our agent has 6 layers of observations. Each layer is a 15 * 15 matrix with value 0 or 1. For each layer, it observes one kind of blocks. From the 1st layer to the 6th layer, the agent observes the blocks of type "diamond", "fence_gate", "dark_oak_fence", "acacia_fence", "emerald_block" or "fence". If one entry of a matrix is 1, it means it is one of the type mentioned above.
 
-### 3.4 Customize PPO Trainer
+### 3.5 Customize PPO Trainer
 In status report, we used PPO trainer with default parameters from rllib for reinforcement learning. The trainer class helps us train, checkpoint model, and compute actions. 
 <p align="center">
 <img width="700" alt="ppo trainer - graph" src="img/rllib.png">
@@ -125,7 +138,7 @@ For our project, we use PyTorch library and add three convolution layers to bett
 ```
 
  
-### 3.5 Rewards
+### 3.6 Rewards
 **Reward Formula**
 
 For the final version, we consider several factors when giving our agent rewards. The reward formula is consist of two part:  **V(s) = P(s) + R(s)**
@@ -164,7 +177,7 @@ Finally, we give the agent +1 reward whenever it collects the diamond and +10 re
 
 From the evaluation result, we conclude that these rewards undoubtfully contributes to improving survival time of our agent. 
  
-### 3.6 Customize rotate
+### 3.7 Customize rotate
 Inspired by the extra credit part from assignment two, we customized rotate functionality of our agent. In the status report, our agent suffers from partial observability. The observation continues to assume the agent is centered and at right angles, which means that the agent’s knowledge of its own location has an orientation error. To make our observation more accurate but not too trivial or complex, we create a customized rotate function for our agent to mitigate orientation error. 
 
 In our rotate function, we eliminate the orientation error of ±45 degrees. Our observation space is (5, 15, 15), and the following is our rotate logic and pseudocode. Please see our source code for more details. 
