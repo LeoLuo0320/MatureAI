@@ -47,8 +47,6 @@ The agent needs to step onto the slab, perform the jump action, and walk through
 
 The agent needs to perform 'open action', and immediately perform 'stop action' and walk through the gate. There will be only two doors generated randomly for the agent to open and the other two are fences that the agent needs to move the corresponding gate and open.
 
-
-
 <p align="center">
     <b>4 Avoiding Fireball (Difficulty: hard, Stochastic)</b>
 </p>
@@ -62,8 +60,9 @@ The agent needs to avoid the fireballs that the ghost shoots, and also the fire 
 <p align="center">
     <b>5 Collecting Rewards(Difficulty: medium, Stochastic)</b>
 </p>
-Behind each type of obstacle, our map will distribute diamonds randomly as the reward. The agent needs to perform the correct action and claim the reward as soon as possible because of the following explosive and the fireballs will burn the reward. 
+Behind each type of obstacle, our map will distribute diamonds randomly as the reward. The agent needs to perform the correct action and claim the reward as soon as possible because of the following explosive and the fireballs will burn the reward.
 
+<p></p>
 <p align="center">
     <b>6 Initial HP of the agent</b>
 </p>
@@ -109,7 +108,7 @@ For our project, we use PyTorch library and add three convolution layers to bett
          TorchModelV2.__init__(self, *args, **kwargs)
          nn.Module.__init__(self)
 
-         self.conv1 = nn.Conv2d(4, 32, kernel_size=7, padding=3)
+         self.conv1 = nn.Conv2d(6, 32, kernel_size=7, padding=3)
          self.conv2 = nn.Conv2d(32, 32, kernel_size=7, padding=3)
          self.conv3 = nn.Conv2d(32, 32, kernel_size=7, padding=3)
          self.policy_layer = nn.Linear(32*15*15, 7)
