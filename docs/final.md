@@ -76,13 +76,14 @@ Because sometimes the TNT explosion cannot kill our agent directly(if the enviro
 Our project use continuous actions with the following action space.
 ```
 self.action_dict = {
-            0: 'move 1',  # Move forward
-            1: 'turn 1',  # Turn right
-            2: 'turn -1',  # Turn left
-            3: 'use 1',  # Start opening the gate
-            4: 'jump 1',  # Start jumping
-            5: 'stop'  # stop all current action
-        }
+    0: 'move 1',  # Move forward
+    1: 'move 0',
+    2: 'turn 1',  # Turn right
+    3: 'turn -1',  # Turn left
+    4: 'use 1',  # Start opening the gate
+    5: 'jump 1',  # Start jumping
+    6: 'stop'  # stop all current action
+}
 ```
 The continuous action space greatly increases the difficulty of taking actions for our agent since it needs to act more precisely towards the environment. One interesting challenge we met during the process is opening the gate. Since we observe the block type of the environment, even if a fence is opened, the agent may still perform the "use" action, which will then close the door and the agent cannot bypass the obstacle. To solve the problem, we add a stop action to the action space so our agent will not only learns how to open the gate but also learns when it is appropriate to stop. Adding this action increases the efficiency of our training and makes the agents perform better.
 
@@ -108,7 +109,7 @@ For our project, we use PyTorch library and add three convolution layers to bett
          TorchModelV2.__init__(self, *args, **kwargs)
          nn.Module.__init__(self)
 
-         self.conv1 = nn.Conv2d(5, 32, kernel_size=7, padding=3)
+         self.conv1 = nn.Conv2d(4, 32, kernel_size=7, padding=3)
          self.conv2 = nn.Conv2d(32, 32, kernel_size=7, padding=3)
          self.conv3 = nn.Conv2d(32, 32, kernel_size=7, padding=3)
          self.policy_layer = nn.Linear(32*15*15, 7)
