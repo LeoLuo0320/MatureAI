@@ -15,53 +15,53 @@ import json
 import math
 import pathlib
 import gym, ray
-from Map import OBS_SIZE, MAX_EPISODE_STEPS, Map
+from Map_Final import OBS_SIZE, MAX_EPISODE_STEPS, Map
 from gym.spaces import Discrete, Box
 from ray.rllib.agents import ppo
 
 # Neural Network related
-import torch
-from torch import nn
-import torch.nn.functional as F
-from ray.rllib.models import ModelCatalog
-from ray.rllib.models.torch.torch_modelv2 import TorchModelV2
+# import torch
+# from torch import nn
+# import torch.nn.functional as F
+# from ray.rllib.models import ModelCatalog
+# from ray.rllib.models.torch.torch_modelv2 import TorchModelV2
 
 DIAMOND_POS = []
 DESTINATION_Z = 10000
 
 
 # Neural Network Model
-class MyModel(TorchModelV2, nn.Module):
-    def __init__(self, *args, **kwargs):
-        TorchModelV2.__init__(self, *args, **kwargs)
-        nn.Module.__init__(self)
+# class MyModel(TorchModelV2, nn.Module):
+#     def __init__(self, *args, **kwargs):
+#         TorchModelV2.__init__(self, *args, **kwargs)
+#         nn.Module.__init__(self)
 
-        # channle number is 4, 32 hiden channels
-        self.conv1 = nn.Conv2d(6, 32, kernel_size=7, padding=3)
-        self.conv2 = nn.Conv2d(32, 32, kernel_size=7, padding=3)
-        self.conv3 = nn.Conv2d(32, 32, kernel_size=7, padding=3)
-        # 7 is the action number
-        self.policy_layer = nn.Linear(32*15*15, 7)
-        self.value_layer = nn.Linear(32*15*15, 1)
+#         # channle number is 2, 32 hiden channels
+#         self.conv1 = nn.Conv2d(4, 32, kernel_size=7, padding=3) # 32, 5, 5
+#         self.conv2 = nn.Conv2d(32, 32, kernel_size=7, padding=3) # 32, 5, 5
+#         self.conv3 = nn.Conv2d(32, 32, kernel_size=7, padding=3) # 32, 5, 5
+#         # 4 is the discrete action number
+#         self.policy_layer = nn.Linear(32*15*15, 5)
+#         self.value_layer = nn.Linear(32*15*15, 1)
 
-        self.value = None
+#         self.value = None
 
-    def forward(self, input_dict, state, seq_lens):
-        x = input_dict['obs']
+#     def forward(self, input_dict, state, seq_lens):
+#         x = input_dict['obs'] # BATCH, 2, 5, 5
 
-        x = F.relu(self.conv1(x))
-        x = F.relu(self.conv2(x))
-        x = F.relu(self.conv3(x))
+#         x = F.relu(self.conv1(x)) # BATCH, 32, 5, 5
+#         x = F.relu(self.conv2(x))
+#         x = F.relu(self.conv3(x))
 
-        x = x.flatten(start_dim=1)
+#         x = x.flatten(start_dim=1) # BATCH, 800
 
-        policy = self.policy_layer(x) # BATCH, 7
-        self.value = self.value_layer(x) # BATCH, 1
+#         policy = self.policy_layer(x) # BATCH, 4
+#         self.value = self.value_layer(x) # BATCH, 1
 
-        return policy, state
+#         return policy, state
 
-    def value_function(self):
-        return self.value.squeeze(1)
+#     def value_function(self):
+#         return self.value.squeeze(1)
 
 
 class MinecraftRunner(gym.Env):
@@ -72,18 +72,16 @@ class MinecraftRunner(gym.Env):
         self.max_episode_steps = MAX_EPISODE_STEPS
         self.log_frequency = 5
         self.action_dict = {
-            0: 'move 1',  # Move forward
-            1: 'move 0',
-            2: 'turn 1',  # Turn right
-            3: 'turn -1',  # Turn left
-            4: 'use 1',  # Start opening the gate
-            5: 'jump 1',  # Start jumping
-            6: 'stop'  # stop all current action
+            0: 'move 1',  # Move one block forward
+            1: 'turn 1',  # Turn 90 degrees to the right
+            2: 'turn -1',  # Turn 90 degrees to the left
+            3: 'use 1',  # For opening gates
+            4: 'jump 1'  # For jump over gates
         }
 
         # Rllib Parameters
         self.action_space = Discrete(len(self.action_dict))
-        self.observation_space = Box(0, 1, shape=(6, self.obs_size, self.obs_size), dtype=np.float32)
+        self.observation_space = Box(0, 1, shape=(6*self.obs_size*self.obs_size,), dtype=np.float32)
 
         # Malmo Parameters
         self.agent_host = MalmoPython.AgentHost()
@@ -103,12 +101,11 @@ class MinecraftRunner(gym.Env):
         self.steps = []
         self.current_to_dest = DESTINATION_Z
         self.shortest_to_dest = DESTINATION_Z
-        self.cur_POSX, self.cur_POSZ = 0.5, 0.5
-        self.pre_POSX, self.pre_POSZ = 0.5, 0.5
 
     def reset(self):
         """
         Resets the environment for the next episode.
+
         Returns
             observation: <np.array> flattened initial obseravtion
         """
@@ -171,42 +168,6 @@ class MinecraftRunner(gym.Env):
 
         return world_state
 
-    def rotate(self, m, k): 
-        for l in range(4):
-            top = 0
-            bottom = self.obs_size - 1
-            left = 0
-            right = self.obs_size - 1
-            while left < right and top < bottom: 
-                for i in range(k):
-                    prev = m[l][top+1][right] 
-                    # Move top row one step left 
-                    for i in range(right, left-1, -1): 
-                        temp = m[l][top][i] 
-                        m[l][top][i] = prev 
-                        prev = temp 
-                    # Move left column one step down 
-                    for i in range(top, bottom+1): 
-                        temp = m[l][i][left] 
-                        m[l][i][left] = prev 
-                        prev = temp 
-                    # Move bottom row one step right 
-                    for i in range(left, right+1): 
-                        temp = m[l][bottom][i] 
-                        m[l][bottom][i] = prev 
-                        prev = temp 
-                    # Move right column one step up 
-                    for i in range(bottom, top-1, -1): 
-                        temp = m[l][i][right] 
-                        m[l][i][right] = prev 
-                        prev = temp 
-                top += 1
-                left += 1
-                bottom -= 1
-                right -= 1
-                k -= 1
-        return m
-
     def obs_diamond(self, agent_x, agent_z):
         # Get observation matrix and agent row/col
         sight = int((OBS_SIZE - 1) / 2)
@@ -238,8 +199,11 @@ class MinecraftRunner(gym.Env):
     def step(self, action):
         """
         Take an action in the environment and return the results.
+
         Args
             action: <int> index of the action to take
+
+
         Returns
             observation: <np.array> flattened array of obseravtion
             reward: <int> reward from taking action
@@ -249,18 +213,29 @@ class MinecraftRunner(gym.Env):
 
         # Get Action
         command = self.action_dict[action]
-        if command not in ['use 1', 'jump 1', 'stop']:
+        if command not in ['use 1', 'jump 1']:
             self.agent_host.sendCommand(command)
             time.sleep(0.1)
-        elif (command == 'use 1' and self.open_gate) or \
-                (command == 'jump 1' and self.jump_gate):
-            self.agent_host.sendCommand(command)
-            time.sleep(0.1)
-        elif command == 'stop':
-            self.agent_host.sendCommand("use 0")
-            self.agent_host.sendCommand("jump 0")
+        elif command == 'use 1' and self.open_gate:
             self.agent_host.sendCommand("turn 0")
             time.sleep(0.1)
+            self.agent_host.sendCommand("move 0")
+            time.sleep(0.1)
+            while self.open_gate:
+                self.agent_host.sendCommand(command)
+                time.sleep(0.1)
+                self.obs, self.open_gate, self.jump_gate = self.get_observation(self.agent_host.getWorldState())
+            self.agent_host.sendCommand('use 0')
+        elif command == 'jump 1' and self.jump_gate:
+            self.agent_host.sendCommand("turn 0")
+            time.sleep(0.1)
+            while self.jump_gate:
+                self.agent_host.sendCommand("move 1")
+                time.sleep(0.1)
+                self.agent_host.sendCommand(command)
+                time.sleep(0.1)
+                self.obs, self.open_gate, self.jump_gate = self.get_observation(self.agent_host.getWorldState())
+            self.agent_host.sendCommand('jump 0')
 
         self.episode_step += 1
 
@@ -278,6 +253,9 @@ class MinecraftRunner(gym.Env):
         # Get Reward
         reward = 0
         for r in world_state.rewards:
+            # print("r", r)
+            # print("value: ", r.getValue())
+            # input("Enter: ")
             reward += r.getValue()
 
         # Reward of moving towards to the destination
@@ -294,18 +272,17 @@ class MinecraftRunner(gym.Env):
             reward += 1
 
         self.episode_return += reward
-        # Punish the agent if the agent remain stationary
-        if math.sqrt((self.pre_POSX - self.cur_POSX) ** 2 +
-                     (self.pre_POSZ - self.cur_POSZ) ** 2) < 0.2:
-            reward -= 0.2
 
         return self.obs, reward, done, dict()
 
     def get_observation(self, world_state):
         """
+        Use the agent observation API to get a flattened 2 x 5 x 5 grid around the agent.
         The agent is in the center square facing up.
+
         Args
             world_state: <object> current agent world state
+
         Returns
             observation: <np.array> the state observation
             allow_break_action: <bool> whether the agent is facing a diamond
@@ -333,14 +310,13 @@ class MinecraftRunner(gym.Env):
                 # Get observation
                 # Get block typegrid.shape
                 grid = observations['floorAll']
+                # obs = obs.flatten()
+                # print('grid: ', grid)
+                # input("Enter: ")
 
                 # Get agent position
                 agent_x = observations['XPos']
                 agent_z = observations['ZPos']
-
-                # update preivous postion and current position
-                self.pre_POSX, self.pre_POSZ = self.cur_POSX, self.cur_POSZ
-                self.cur_POSX, self.cur_POSZ = agent_x, agent_z
 
                 # Update shortest distance to destination if current distance is shorter
                 self.current_to_dest = DESTINATION_Z - agent_z
@@ -357,6 +333,10 @@ class MinecraftRunner(gym.Env):
                             obs.append(0.0)
                 obs = np.array(obs)
                 obs = obs.reshape((len(obs_list) + 1, self.obs_size, self.obs_size))
+                # print(len(obs))
+                # print(len(obs[0]))
+                # print(len(obs[0][0]))
+                # print(obs)
 
                 # Remove collected diamond's position from the list to avoid repeat reward
                 self.update_diamond_list(agent_x, agent_z)
@@ -364,20 +344,12 @@ class MinecraftRunner(gym.Env):
                 # Rotate observation with orientation of agent
                 yaw = observations['Yaw']
 
-                if yaw >= 202.5 and yaw < 247.5:
-                    obs = self.rotate(obs, 7)
-                elif yaw >= 247.5 and yaw < 292.5:
+                if yaw >= 225 and yaw < 315:
                     obs = np.rot90(obs, k=1, axes=(1, 2))
-                elif yaw >= 292.5 and yaw < 337.5:
-                    obs = self.rotate(obs, 21)
-                elif yaw >= 337.5 or yaw < 22.5:
+                elif yaw >= 315 or yaw < 45:
                     obs = np.rot90(obs, k=2, axes=(1, 2))
-                elif yaw >= 22.5 and yaw < 67.5:
-                    obs = self.rotate(obs, 35)
-                elif yaw >= 67.5 and yaw < 112.5:
+                elif yaw >= 45 and yaw < 135:
                     obs = np.rot90(obs, k=3, axes=(1, 2))
-                elif yaw >= 112.5 and yaw < 157.5:
-                    obs = self.rotate(obs, 49)
 
                 if 'LineOfSight' in observations.keys():
                     open_gate = observations['LineOfSight']['type'] == "fence_gate"
@@ -385,6 +357,9 @@ class MinecraftRunner(gym.Env):
 
             break
 
+        # print(obs)
+        # input("Enter:")
+        obs = obs.flatten()
         return obs, open_gate, jump_gate
 
     def GetXML(self):
@@ -395,6 +370,7 @@ class MinecraftRunner(gym.Env):
     def log_returns(self):
         """
         Log the current returns as a graph and text file
+
         Args:
             steps (list): list of global steps after each episode
             returns (list): list of total return of each episode
@@ -415,7 +391,7 @@ class MinecraftRunner(gym.Env):
 
 if __name__ == '__main__':
 
-    ModelCatalog.register_custom_model('my_model', MyModel)
+    # ModelCatalog.register_custom_model('my_model', MyModel)
 
     ray.init()
     trainer = ppo.PPOTrainer(env=MinecraftRunner, config={
@@ -423,10 +399,10 @@ if __name__ == '__main__':
         'framework': 'torch',  # Use pyotrch instead of tensorflow
         'num_gpus': 0,  # We aren't using GPUs
         'num_workers': 0,  # We aren't using parallelism
-        'model': {
-            'custom_model': 'my_model',
-            'custom_model_config': {}
-        }
+        # 'model': {
+        #     'custom_model': 'my_model',
+        #     'custom_model_config': {}
+        # }
 
     })
 
